@@ -1,0 +1,29 @@
+1. Player (Random)
+mean	std
+-3.8375715	7.79836616798061
+
+2. Player (Expert)
+mean	std
+17.124166	9.76237442717193
+
+
+
+
+
+1. Player (Random)
+mean	std
+-1.2506125	8.878668779164853
+
+2. Player (Random)
+mean	std
+-1.253515	8.878286239851452
+
+
+
+1. Player (Expert)
+mean	std
+18.897207	14.835760770832383
+
+2. Player (Expert)
+mean	std
+18.8918505	14.854690387788006

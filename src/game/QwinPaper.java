@@ -1,0 +1,222 @@
+package game;
+
+public class QwinPaper {
+	public static final int LINE_LENGTH = 9;
+	private int[] lineRed;
+	private int[] lineYellow;
+	private int[] linePurple;
+	private int numMisthrows;
+	private boolean reCalculateScore;
+	private int lastScore;
+	
+	public QwinPaper() {
+		clear();
+	}
+	
+	public void clear() {
+		lineRed = new int[LINE_LENGTH];
+		lineYellow = new int[LINE_LENGTH];
+		linePurple = new int[LINE_LENGTH];
+		numMisthrows = 0;
+		reCalculateScore = true;
+	}
+	
+	public int getNumberOfMisthrows() {
+		return numMisthrows;
+	}
+	
+	public int[] getRedLine() {
+		int[] copyRes = new int[lineRed.length];
+		for (int i = 0; i < lineRed.length; i++) {
+			copyRes[i] = lineRed[i];
+		}
+		return copyRes;
+	}
+	
+	public int[] getYellowLine() {
+		int[] copyRes = new int[lineYellow.length];
+		for (int i = 0; i < lineYellow.length; i++) {
+			copyRes[i] = lineYellow[i];
+		}
+		return copyRes;
+	}
+	
+	public int[] getPurpleLine() {
+		int[] copyRes = new int[linePurple.length];
+		for (int i = 0; i < linePurple.length; i++) {
+			copyRes[i] = linePurple[i];
+		}
+		return copyRes;
+	}
+	
+	public boolean isEndCondition() {
+		if (numMisthrows >= 4) return true;
+		int numberOfFullLines = 0;
+		int i = 0;
+		while(i < LINE_LENGTH && lineRed[i]>0) i++;
+		if (i == LINE_LENGTH) numberOfFullLines++;
+		i = 0;
+		while(i < LINE_LENGTH && lineYellow[i]>0) i++;
+		if (i == LINE_LENGTH) numberOfFullLines++;
+		if (numberOfFullLines < 1) return false;
+		i = 0;
+		while(i < LINE_LENGTH && linePurple[i]>0) i++;
+		if (i == LINE_LENGTH) numberOfFullLines++;
+		return (numberOfFullLines > 1);
+	}
+	
+	public void enterNumber(int color, int pos, int number) {
+		switch(color) {
+		case 0: lineRed[pos] = number;
+			break;
+		case 1: lineYellow[pos] = number;
+			break;
+		case 2: linePurple[pos] = number;
+			break;
+		}
+		reCalculateScore = true;
+	}
+	
+	public void misthrow() {
+		numMisthrows++;
+		reCalculateScore = true;
+	}
+	
+	public int calculateScore() {
+		if (!reCalculateScore) return lastScore;
+		int score = 0;
+		int zs = 0;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (lineRed[i]>0) zs++;
+		}
+		score += (zs==LINE_LENGTH?lineRed[LINE_LENGTH-1]:zs);
+		zs = 0;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (lineYellow[i]>0) zs++;
+		}
+		score += (zs==LINE_LENGTH?lineYellow[LINE_LENGTH-1]:zs);
+		zs = 0;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (linePurple[i]>0) zs++;
+		}
+		score += (zs==LINE_LENGTH?linePurple[LINE_LENGTH-1]:zs);
+		if (lineRed[0] > 0 && lineYellow[1] > 0 && linePurple[2] > 0) score += linePurple[2];
+		if (lineRed[1] > 0 && lineYellow[2] > 0 && linePurple[3] > 0) score += lineRed[1];
+		if (lineRed[4] > 0 && lineYellow[5] > 0 && linePurple[6] > 0) score += lineRed[4];
+		if (lineRed[5] > 0 && lineYellow[6] > 0 && linePurple[7] > 0) score += lineYellow[6];
+		if (lineRed[6] > 0 && lineYellow[7] > 0 && linePurple[8] > 0) score += linePurple[8];
+		reCalculateScore = false;
+		lastScore = score-5*numMisthrows;
+		return lastScore;
+	}
+	
+	public boolean isPositionValidForNumber(int color, int pos, int number) {
+		if (color == 0) {
+			//aktuelle Position
+			if (lineRed[pos] > 0) return false; 
+			//Spalten
+			switch (pos) {
+			case 0: if (lineYellow[pos+1]==number || linePurple[pos+2]==number) return false;
+				break;
+			case 1:	if (lineYellow[pos+1]==number || linePurple[pos+2]==number) return false;
+				break;
+			case 2:	if (lineYellow[pos+1]==number) return false;
+				break;
+			case 3:	if (linePurple[pos+2]==number) return false;
+				break;
+			case 4:	if (lineYellow[pos+1]==number || linePurple[pos+2]==number) return false;
+				break;
+			case 5:	if (lineYellow[pos+1]==number || linePurple[pos+2]==number) return false;
+				break;
+			case 6:	if (lineYellow[pos+1]==number || linePurple[pos+2]==number) return false;
+				break;
+			case 7:	if (lineYellow[pos+1]==number) return false;
+				break;
+			}
+			//Zeilen
+			int i = pos-1;
+			while (i >= 0 && lineRed[i] == 0) i--;
+			if (i >= 0 && lineRed[i] >= number) return false;
+			i = pos+1;
+			while (i < LINE_LENGTH && lineRed[i] == 0) i++;
+			if (i < LINE_LENGTH && lineRed[i] <= number) return false;
+		} else if (color == 1) {
+			//aktuelle Position
+			if (lineYellow[pos] > 0) return false;
+			//Spalten
+			switch (pos) {
+			case 0:	if (linePurple[pos+1]==number) return false;
+				break;
+			case 1:	if (lineRed[pos-1]==number || linePurple[pos+1]==number) return false;
+				break;
+			case 2:	if (lineRed[pos-1]==number || linePurple[pos+1]==number) return false;
+				break;
+			case 3:	if (lineRed[pos-1]==number) return false;
+				break;
+			case 4:	if (linePurple[pos]==number) return false;
+				break;
+			case 5:	if (lineRed[pos-1]==number || linePurple[pos+1]==number) return false;
+				break;
+			case 6:	if (lineRed[pos-1]==number || linePurple[pos+1]==number) return false;
+				break;
+			case 7:	if (lineRed[pos-1]==number || linePurple[pos+1]==number) return false;
+				break;
+			case 8: if (lineRed[pos-1]==number) return false;
+				break;
+			}
+			//Zeilen
+			int i = pos-1;
+			while (i >= 0 && lineYellow[i] == 0) i--;
+			if (i >= 0 && lineYellow[i] >= number) return false;
+			i = pos+1;
+			while (i < LINE_LENGTH && lineYellow[i] == 0) i++;
+			if (i < LINE_LENGTH && lineYellow[i] <= number) return false;
+		} else if (color == 2) {
+			//aktuelle Position
+			if (linePurple[pos] > 0) return false;
+			//Spalten
+			switch (pos) { 
+			case 1:	if (lineYellow[pos-1]==number) return false;
+				break;
+			case 2:	if (lineRed[pos-2]==number || lineYellow[pos-1]==number) return false;
+				break;
+			case 3:	if (lineRed[pos-2]==number || lineYellow[pos-1]==number) return false;
+				break;
+			case 4: if (lineYellow[pos]==number) return false;
+				break;
+			case 5:	if (lineRed[pos-2]==number) return false;
+				break;
+			case 6:	if (lineRed[pos-2]==number || lineYellow[pos-1]==number) return false;
+				break;
+			case 7:	if (lineRed[pos-2]==number || lineYellow[pos-1]==number) return false;
+				break;
+			case 8: if (lineRed[pos-2]==number || lineYellow[pos-1]==number) return false;
+				break;
+			}
+			//Zeilen
+			int i = pos-1;
+			while (i >= 0 && linePurple[i] == 0) i--;
+			if (i >= 0 && linePurple[i] >= number) return false;
+			i = pos+1;
+			while (i < LINE_LENGTH && linePurple[i] == 0) i++;
+			if (i < LINE_LENGTH && linePurple[i] <= number) return false;
+		} else throw new IllegalArgumentException("illegal color int");
+		return true;
+	}
+	
+	public String toString() {
+		String strRed = "#  #  "+lineRed[0]+" ["+lineRed[1]+"] "+lineRed[2]+"     "+lineRed[3]+" ["+lineRed[4]+"] "+lineRed[5]+"  "+lineRed[6]+"  "+lineRed[7]+"  "+lineRed[8];
+		String strYellow = "#  "+lineYellow[0]+"  "+lineYellow[1]+"  "+lineYellow[2]+"  "+lineYellow[3]+"  "+lineYellow[4]+"     "+lineYellow[5]+" ["+lineYellow[6]+"] "+lineYellow[7]+"  "+lineYellow[8]+"  #";
+		String strPurple = ""+linePurple[0]+"  "+linePurple[1]+" ["+linePurple[2]+"] "+linePurple[3]+"     "+linePurple[4]+"  "+linePurple[5]+"  "+linePurple[6]+"  "+linePurple[7]+" ["+linePurple[8]+"] #  #";
+		String strMisthrow = "Misthrows = "+numMisthrows;
+		/*
+		 *  #  #  0 [0] 0     0 [0] 0  0  0  0
+		 *  #  0  0  0  0  0     0 [0] 0  0  #
+		 *  0  0 [0] 0     0  0  0  0 [0] #  #
+		 *  XXXX
+		 */
+		
+		return strRed+"\n"+strYellow+"\n"+strPurple+"\n"+strMisthrow;
+		
+	}
+}
