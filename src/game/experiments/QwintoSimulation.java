@@ -40,55 +40,55 @@ import pdf.util.UtilMethods;
 
 public class QwintoSimulation {
 	public static void main(String[] args) {
-		NNPlayer1v1MultiThreadMatcher(0);
-		//runNNPlayer1v1Experiments();
+		// simpleMatch();
+		 NNPlayer1v1MultiThreadMatcher(1);
+		// runNNPlayer1v1Experiments();
+		// playerEvolutionAvA();
+		//NN2Player1v1Backprop(4);
 	}
-	
-	public static String combinationFormatter(final long millis) {
-	    long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
-	            - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
-	    long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
-	            - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
-	    long hours = TimeUnit.MILLISECONDS.toHours(millis);
 
-	    StringBuilder b = new StringBuilder();
-	    b.append(hours == 0 ? "00" : hours < 10 ? String.valueOf("0" + hours) : 
-	    String.valueOf(hours));
-	    b.append(":");
-	    b.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) : 
-	    String.valueOf(minutes));
-	        b.append(":");
-	    b.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) : 
-	    String.valueOf(seconds));
-	    return b.toString(); 
-	 }
-	
+	public static String combinationFormatter(final long millis) {
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
+				- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
+				- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+		long hours = TimeUnit.MILLISECONDS.toHours(millis);
+
+		StringBuilder b = new StringBuilder();
+		b.append(hours == 0 ? "00" : hours < 10 ? String.valueOf("0" + hours) : String.valueOf(hours));
+		b.append(":");
+		b.append(minutes == 0 ? "00" : minutes < 10 ? String.valueOf("0" + minutes) : String.valueOf(minutes));
+		b.append(":");
+		b.append(seconds == 0 ? "00" : seconds < 10 ? String.valueOf("0" + seconds) : String.valueOf(seconds));
+		return b.toString();
+	}
+
 	public static void NNPlayer1v1MultiThreadMatcher(int experimentNumber) {
-		MatchMultiThreader.randomPlayPercent = 0.01;
-		double regularisation = 0.05;
+		MatchMultiThreader.randomPlayPercent = 0.5;
+		double regularisation = 0.005;
 		int numberOfTestMatches = 2000;
 		Random init = new Random();
 		QwinPlayerNN2 initPlayer = new QwinPlayerNN2(new Random(init.nextLong()));
 		MatchMultiThreader.diceThrowNet = initPlayer.getDiceThrowNet();
 		MatchMultiThreader.actionListNet = initPlayer.getActionListNet();
-		//int j = 0;
-		//Learner learnerdb = new VProp85avg();
-		Learner learnerdw = new GradientDescent(0.1);
-		//Learner learnerab = new VProp85avg();
-		Learner learneraw = new GradientDescent(0.1);
+		// int j = 0;
+		// Learner learnerdb = new VProp85avg();
+		Learner learnerdw = new MomentumDescent(0.1, 0.9);
+		// Learner learnerab = new VProp85avg();
+		Learner learneraw = new MomentumDescent(0.1, 0.9);
 		int step = 0;
 		double stepMillis = 0;
-		while (step <= 500) {
+		while (true) {
 			long start = System.currentTimeMillis();
 			step++;
 			ThreadGroup tg = new ThreadGroup("main");
-			Thread th1 = new MatchMultiThreader("1",tg);
+			Thread th1 = new MatchMultiThreader("1", tg);
 			th1.start();
-			Thread th2 = new MatchMultiThreader("2",tg);
+			Thread th2 = new MatchMultiThreader("2", tg);
 			th2.start();
-			Thread th3 = new MatchMultiThreader("3",tg);
+			Thread th3 = new MatchMultiThreader("3", tg);
 			th3.start();
-			Thread th4 = new MatchMultiThreader("4",tg);
+			Thread th4 = new MatchMultiThreader("4", tg);
 			th4.start();
 			QwinPlayer[] testP = new QwinPlayer[2];
 			QwinPlayerNN2 testNN2 = new QwinPlayerNN2(new Random(init.nextLong()));
@@ -108,30 +108,26 @@ public class QwintoSimulation {
 			System.out.println(step + ". Step:");
 			System.out.println("vs ExpertETest2\t" + avgScore + "\t" + winrate);
 			System.out.println();
-			try (FileWriter fw = new FileWriter("experiment_r0.1_0.01_" + experimentNumber + ".txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+			try (FileWriter fw = new FileWriter("experiment_r0.1_0.01_" + experimentNumber + ".txt", true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					PrintWriter out = new PrintWriter(bw)) {
 				out.println(avgScore + "\t" + winrate);
 			} catch (IOException e) {
 				// exception handling left as an exercise for the reader
 			}
-			/*if (j % 10 == 0) {
-				try {
-					File paramFile = new File("" + j / 10 + "_" + avgScore + "_" + winrate + ".txt");
-					FileWriter writer = new FileWriter(paramFile);
-					double[] weightsBiasVector = diceThrowNet.copyWeightBiasVector();
-					for (int i = 0; i < weightsBiasVector.length; i++) {
-						writer.write(weightsBiasVector[i] + "\n");
-					}
-					weightsBiasVector = actionListNet.copyWeightBiasVector();
-					for (int i = 0; i < weightsBiasVector.length; i++) {
-						writer.write(weightsBiasVector[i] + "\n");
-					}
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}*/
-			//j++;
-			//randomPlayPercent = (randomPlayPercent * 0.995 > 0 ? randomPlayPercent * 0.995 : randomPlayPercent);
+			/*
+			 * if (j % 10 == 0) { try { File paramFile = new File("" + j / 10 + "_" +
+			 * avgScore + "_" + winrate + ".txt"); FileWriter writer = new
+			 * FileWriter(paramFile); double[] weightsBiasVector =
+			 * diceThrowNet.copyWeightBiasVector(); for (int i = 0; i <
+			 * weightsBiasVector.length; i++) { writer.write(weightsBiasVector[i] + "\n"); }
+			 * weightsBiasVector = actionListNet.copyWeightBiasVector(); for (int i = 0; i <
+			 * weightsBiasVector.length; i++) { writer.write(weightsBiasVector[i] + "\n"); }
+			 * writer.close(); } catch (IOException e) { e.printStackTrace(); } }
+			 */
+			// j++;
+			// randomPlayPercent = (randomPlayPercent * 0.995 > 0 ? randomPlayPercent *
+			// 0.995 : randomPlayPercent);
 			// learningRate = (learningRate * 0.99 > 0 ? learningRate * 0.99 :
 			// learningRate);
 			try {
@@ -142,7 +138,7 @@ public class QwintoSimulation {
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-			
+
 			System.out.println("Simulations done.");
 			// BACKPROP LEARN
 			for (int m = 0; m < 10; m++) {
@@ -152,24 +148,28 @@ public class QwintoSimulation {
 				for (Pair<double[], Integer> pair : MatchMultiThreader.betterDiceThrowHistory) {
 					double[] targetVector = new double[7];
 					targetVector[pair.getY()] = 1;
-					double[] dout = MatchMultiThreader.diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					double[] dout = MatchMultiThreader.diceThrowNet.calculateDerivativeOutput(pair.getX(),
+							targetVector);
 					for (int i = 0; i < dout.length; i++) {
-						if (i != pair.getY()) dout[i] = 0;
+						if (i != pair.getY())
+							dout[i] = 0;
 					}
 					MatchMultiThreader.diceThrowNet.calculateGradient(dout);
 					double[] tempGradient = MatchMultiThreader.diceThrowNet.getWeightBiasGradient();
 					gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
 					n++;
 				}
-				
+
 				// DICE THROW WORSE
-			
+
 				for (Pair<double[], Integer> pair : MatchMultiThreader.worseDiceThrowHistory) {
 					double[] targetVector = new double[7];
 					targetVector[pair.getY()] = 0;
-					double[] dout = MatchMultiThreader.diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					double[] dout = MatchMultiThreader.diceThrowNet.calculateDerivativeOutput(pair.getX(),
+							targetVector);
 					for (int i = 0; i < dout.length; i++) {
-						if (i != pair.getY()) dout[i] = 0;
+						if (i != pair.getY())
+							dout[i] = 0;
 					}
 					MatchMultiThreader.diceThrowNet.calculateGradient(dout);
 					double[] tempGradient = MatchMultiThreader.diceThrowNet.getWeightBiasGradient();
@@ -189,9 +189,11 @@ public class QwintoSimulation {
 				for (Pair<double[], Integer> pair : MatchMultiThreader.betterActionHistory) {
 					double[] targetVector = new double[28];
 					targetVector[pair.getY()] = 1;
-					double[] dout = MatchMultiThreader.actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					double[] dout = MatchMultiThreader.actionListNet.calculateDerivativeOutput(pair.getX(),
+							targetVector);
 					for (int i = 0; i < dout.length; i++) {
-						if (i != pair.getY()) dout[i] = 0;
+						if (i != pair.getY())
+							dout[i] = 0;
 					}
 					MatchMultiThreader.actionListNet.calculateGradient(dout);
 					double[] tempGradient = MatchMultiThreader.actionListNet.getWeightBiasGradient();
@@ -207,9 +209,11 @@ public class QwintoSimulation {
 				for (Pair<double[], Integer> pair : MatchMultiThreader.worseActionHistory) {
 					double[] targetVector = new double[28];
 					targetVector[pair.getY()] = 0;
-					double[] dout = MatchMultiThreader.actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					double[] dout = MatchMultiThreader.actionListNet.calculateDerivativeOutput(pair.getX(),
+							targetVector);
 					for (int i = 0; i < dout.length; i++) {
-						if (i != pair.getY()) dout[i] = 0;
+						if (i != pair.getY())
+							dout[i] = 0;
 					}
 					MatchMultiThreader.actionListNet.calculateGradient(dout);
 					double[] tempGradient = MatchMultiThreader.actionListNet.getWeightBiasGradient();
@@ -224,30 +228,30 @@ public class QwintoSimulation {
 					MatchMultiThreader.actionListNet.applyWeightsBiasGradient(gradient, regularisation);
 				}
 			}
-			
+
 			MatchMultiThreader.reset();
 			long end = System.currentTimeMillis();
 			if (stepMillis == 0) {
-				stepMillis = end-start;
+				stepMillis = end - start;
 			} else {
-				stepMillis = stepMillis*0.95 + (end-start)*0.05;
+				stepMillis = stepMillis * 0.95 + (end - start) * 0.05;
 			}
-			System.out.println(end-start);
-			System.out.println("approx. time left: "+combinationFormatter((long)(stepMillis*(501-step))));
+			System.out.println(end - start);
+			System.out.println("approx. time left: " + combinationFormatter((long) (stepMillis * (501 - step))));
 		}
 	}
-	
+
 	public static void runNNPlayer1v1Experiments() {
 		ThreadGroup tg = new ThreadGroup("main");
 		int np = Runtime.getRuntime().availableProcessors() - 1; // -1 for leaving one processor free
-		
+
 		NNPlayer1v1Backprop[] experiments = new NNPlayer1v1Backprop[10];
 		for (int i = 0; i < experiments.length; i++) {
 			experiments[i] = new NNPlayer1v1Backprop(tg, i);
 		}
 		int k = 0;
-		while(k < 10) {
-			if (tg.activeCount()<np) {
+		while (k < 10) {
+			if (tg.activeCount() < np) {
 				Thread experiment = experiments[k];
 				experiment.start();
 				k++;
@@ -259,18 +263,23 @@ public class QwintoSimulation {
 				}
 			}
 		}
-		while(tg.activeCount()>0)
-		{
+		while (tg.activeCount() > 0) {
 
-			try {Thread.sleep(10000);} 
+			try {
+				Thread.sleep(10000);
+			}
 
-				catch (InterruptedException e) {e.printStackTrace();}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
 		}
 	}
 
 	private static int[][] simulateMatches(QwinPlayer[] players, int iterations, boolean print) {
-		if (print) System.out.println("Simulation of " + iterations + " matches between " + players.length + " players started.");
+		if (print)
+			System.out.println(
+					"Simulation of " + iterations + " matches between " + players.length + " players started.");
 		Random init = new Random();
 		int[][] scores = new int[players.length][iterations];
 		for (int i = 0; i < iterations; i++) {
@@ -282,10 +291,13 @@ public class QwintoSimulation {
 			for (int k = 0; k < players.length; k++) {
 				scores[k][i] = players[k].getPaper().calculateScore();
 			}
-			if (print && i % (iterations / 10) == 0) System.out.print("" + ((i * 100) / iterations) + "%\t");
+			if (print && i % (iterations / 10) == 0)
+				System.out.print("" + ((i * 100) / iterations) + "%\t");
 		}
-		if (print) System.out.println("100%");
-		if (print) System.out.println("Simulations done\n");
+		if (print)
+			System.out.println("100%");
+		if (print)
+			System.out.println("Simulations done\n");
 		return scores;
 	}
 
@@ -306,8 +318,9 @@ public class QwintoSimulation {
 
 	public static void NN2Player1v1Backprop(int experimentNumber) {
 		double randomPlayPercent = 0.5;
-		double regularisation = 0.1;
-		int numberOfTestMatches = 2000;
+		double regularisation = 0.0005;
+		int numberOfTestMatches = 1000;
+		int numberOfLearningSteps = 10;
 		Random init = new Random();
 		QwinPlayerNN2 initPlayer = new QwinPlayerNN2(new Random(init.nextLong()));
 		FeedForwardNetwork diceThrowNet = initPlayer.getDiceThrowNet();
@@ -316,25 +329,25 @@ public class QwintoSimulation {
 		ArrayList<Pair<double[], Integer>> betterActionHistory = new ArrayList<Pair<double[], Integer>>();
 		ArrayList<Pair<double[], Integer>> worseDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
 		ArrayList<Pair<double[], Integer>> worseActionHistory = new ArrayList<Pair<double[], Integer>>();
-		//int j = 0;
-		//Learner learnerdb = new VProp85avg();
-		Learner learnerdw = new MomentumDescent(0.1,0.9);
-		//Learner learnerab = new VProp85avg();
-		Learner learneraw = new MomentumDescent(0.1,0.9);
+		// int j = 0;
+		// Learner learnerdb = new VProp85avg();
+		Learner learnerdw = new MomentumDescent(0.1, 0.9);
+		// Learner learnerab = new VProp85avg();
+		Learner learneraw = new MomentumDescent(0.1, 0.9);
 		int step = 0;
-		while (step <= 500) {
+		while (true) {
 			step++;
 			int n1 = 0;
 			int n2 = 0;
-			while (n1 < 1000 || n2 < 1000) {
+			while (n1 < 2000 || n2 < 2000) {
 				QwinPlayerNN2[] player = new QwinPlayerNN2[2];
 				int[] score = new int[2];
 				// SET NEURAL NETWORKS
-				 for (int i = 0; i < 2; i++) {
-					 player[i] = new QwinPlayerNN2(new Random(init.nextLong()));
-					 player[i].setDiceThrowNet(diceThrowNet);
-					 player[i].setActionListNet(actionListNet);
-				 }
+				for (int i = 0; i < 2; i++) {
+					player[i] = new QwinPlayerNN2(new Random(init.nextLong()));
+					player[i].setDiceThrowNet(diceThrowNet);
+					player[i].setActionListNet(actionListNet);
+				}
 				// player[1] = new QwinPlayerExpertETest2(new Random(init.nextLong()));
 				// CALCULATE MATCH
 				QwintoMatchBP match = new QwintoMatchBP(new Random(init.nextLong()), player);
@@ -348,7 +361,7 @@ public class QwintoSimulation {
 					betterActionHistory.addAll(player[0].getRndActionHistory());
 					worseDiceThrowHistory.addAll(player[1].getRndDiceThrowHistory());
 					worseActionHistory.addAll(player[1].getRndActionHistory());
-				} else if (score[1] > score[0]){
+				} else if (score[1] > score[0]) {
 					betterDiceThrowHistory.addAll(player[1].getRndDiceThrowHistory());
 					betterActionHistory.addAll(player[1].getRndActionHistory());
 					worseDiceThrowHistory.addAll(player[0].getRndDiceThrowHistory());
@@ -376,115 +389,123 @@ public class QwintoSimulation {
 			System.out.println(step + ". Step:");
 			System.out.println("vs ExpertETest2\t" + avgScore + "\t" + winrate);
 			System.out.println();
-			try (FileWriter fw = new FileWriter("experiment_0.5_" + experimentNumber + ".txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+			try (FileWriter fw = new FileWriter("experiment_0.5_" + experimentNumber + ".txt", true);
+					BufferedWriter bw = new BufferedWriter(fw);
+					PrintWriter out = new PrintWriter(bw)) {
 				out.println(avgScore + "\t" + winrate);
 			} catch (IOException e) {
 				// exception handling left as an exercise for the reader
 			}
-			/*if (j % 10 == 0) {
-				try {
-					File paramFile = new File("" + j / 10 + "_" + avgScore + "_" + winrate + ".txt");
-					FileWriter writer = new FileWriter(paramFile);
-					double[] weightsBiasVector = diceThrowNet.copyWeightBiasVector();
-					for (int i = 0; i < weightsBiasVector.length; i++) {
-						writer.write(weightsBiasVector[i] + "\n");
-					}
-					weightsBiasVector = actionListNet.copyWeightBiasVector();
-					for (int i = 0; i < weightsBiasVector.length; i++) {
-						writer.write(weightsBiasVector[i] + "\n");
-					}
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+			try {
+				File paramFile = new File("" + step + "_" + avgScore + "_" + winrate + ".txt");
+				FileWriter writer = new FileWriter(paramFile);
+				double[] weightsBiasVector = diceThrowNet.copyWeightBiasVector();
+				for (int i = 0; i < weightsBiasVector.length; i++) {
+					writer.write(weightsBiasVector[i] + "\n");
 				}
-			}*/
-			//j++;
-			//randomPlayPercent = (randomPlayPercent * 0.995 > 0 ? randomPlayPercent * 0.995 : randomPlayPercent);
+				weightsBiasVector = actionListNet.copyWeightBiasVector();
+				for (int i = 0; i < weightsBiasVector.length; i++) {
+					writer.write(weightsBiasVector[i] + "\n");
+				}
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// j++;
+			// randomPlayPercent = (randomPlayPercent * 0.995 > 0 ? randomPlayPercent *
+			// 0.995 : randomPlayPercent);
 			// learningRate = (learningRate * 0.99 > 0 ? learningRate * 0.99 :
 			// learningRate);
 			// BACKPROP LEARN
+			for (int p = 0; p < numberOfLearningSteps; p++) {
+				// DICE THROW BETTER
+				int n = 0;
+				double[] gradient = null;
+				for (Pair<double[], Integer> pair : betterDiceThrowHistory) {
+					double[] targetVector = new double[7];
+					targetVector[pair.getY()] = 1;
+					double[] dout = diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					for (int i = 0; i < dout.length; i++) {
+						if (i != pair.getY())
+							dout[i] = 0;
+					}
+					diceThrowNet.calculateGradient(dout);
+					double[] tempGradient = diceThrowNet.getWeightBiasGradient();
+					gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
+					n++;
+				}
+				// if (gradient != null) {
+				// gradient = learnerdb.adaptGradientVector(gradient);
+				// diceThrowNet.applyWeightsBiasGradient(gradient);
+				// }
+				// DICE THROW WORSE
+				// n = 0;
+				// gradient = null;
+				for (Pair<double[], Integer> pair : worseDiceThrowHistory) {
+					double[] targetVector = new double[7];
+					targetVector[pair.getY()] = 0;
+					double[] dout = diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					for (int i = 0; i < dout.length; i++) {
+						if (i != pair.getY())
+							dout[i] = 0;
+					}
+					diceThrowNet.calculateGradient(dout);
+					double[] tempGradient = diceThrowNet.getWeightBiasGradient();
+					gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
+					n++;
+				}
+				if (gradient != null) {
+					for (int i = 0; i < gradient.length; i++) {
+						gradient[i] /= n;
+					}
+					gradient = learnerdw.adaptGradientVector(gradient);
+					diceThrowNet.applyWeightsBiasGradient(gradient, regularisation);
+				}
+				// ACTION LIST
+				n = 0;
+				gradient = null;
+				for (Pair<double[], Integer> pair : betterActionHistory) {
+					double[] targetVector = new double[28];
+					targetVector[pair.getY()] = 1;
+					double[] dout = actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					for (int i = 0; i < dout.length; i++) {
+						if (i != pair.getY())
+							dout[i] = 0;
+					}
+					actionListNet.calculateGradient(dout);
+					double[] tempGradient = actionListNet.getWeightBiasGradient();
+					gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
+					n++;
+				}
+				// if (gradient != null) {
+				// gradient = learnerab.adaptGradientVector(gradient);
+				// actionListNet.applyWeightsBiasGradient(gradient);
+				// }
+				// n = 0;
+				// gradient = null;
+				for (Pair<double[], Integer> pair : worseActionHistory) {
+					double[] targetVector = new double[28];
+					targetVector[pair.getY()] = 0;
+					double[] dout = actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
+					for (int i = 0; i < dout.length; i++) {
+						if (i != pair.getY())
+							dout[i] = 0;
+					}
+					actionListNet.calculateGradient(dout);
+					double[] tempGradient = actionListNet.getWeightBiasGradient();
+					gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
+					n++;
+				}
+				if (gradient != null) {
+					for (int i = 0; i < gradient.length; i++) {
+						gradient[i] /= n;
+					}
+					gradient = learneraw.adaptGradientVector(gradient);
+					actionListNet.applyWeightsBiasGradient(gradient, regularisation);
+				}
 
-			// DICE THROW BETTER
-			int n = 0;
-			double[] gradient = null;
-			for (Pair<double[], Integer> pair : betterDiceThrowHistory) {
-				double[] targetVector = new double[7];
-				targetVector[pair.getY()] = 1;
-				double[] dout = diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
-				for (int i = 0; i < dout.length; i++) {
-					if (i != pair.getY()) dout[i] = 0;
-				}
-				diceThrowNet.calculateGradient(dout);
-				double[] tempGradient = diceThrowNet.getWeightBiasGradient();
-				gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
-				n++;
 			}
-			// if (gradient != null) {
-			// gradient = learnerdb.adaptGradientVector(gradient);
-			// diceThrowNet.applyWeightsBiasGradient(gradient);
-			// }
-			// DICE THROW WORSE
-			// n = 0;
-			// gradient = null;
-			for (Pair<double[], Integer> pair : worseDiceThrowHistory) {
-				double[] targetVector = new double[7];
-				targetVector[pair.getY()] = 0;
-				double[] dout = diceThrowNet.calculateDerivativeOutput(pair.getX(), targetVector);
-				for (int i = 0; i < dout.length; i++) {
-					if (i != pair.getY()) dout[i] = 0;
-				}
-				diceThrowNet.calculateGradient(dout);
-				double[] tempGradient = diceThrowNet.getWeightBiasGradient();
-				gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
-				n++;
-			}
-			if (gradient != null) {
-				for (int i = 0; i < gradient.length; i++) {
-					gradient[i] /= n;
-				}
-				gradient = learnerdw.adaptGradientVector(gradient);
-				diceThrowNet.applyWeightsBiasGradient(gradient, regularisation);
-			}
-			// ACTION LIST
-			n = 0;
-			gradient = null;
-			for (Pair<double[], Integer> pair : betterActionHistory) {
-				double[] targetVector = new double[28];
-				targetVector[pair.getY()] = 1;
-				double[] dout = actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
-				for (int i = 0; i < dout.length; i++) {
-					if (i != pair.getY()) dout[i] = 0;
-				}
-				actionListNet.calculateGradient(dout);
-				double[] tempGradient = actionListNet.getWeightBiasGradient();
-				gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
-				n++;
-			}
-			// if (gradient != null) {
-			// gradient = learnerab.adaptGradientVector(gradient);
-			// actionListNet.applyWeightsBiasGradient(gradient);
-			// }
-			// n = 0;
-			// gradient = null;
-			for (Pair<double[], Integer> pair : worseActionHistory) {
-				double[] targetVector = new double[28];
-				targetVector[pair.getY()] = 0;
-				double[] dout = actionListNet.calculateDerivativeOutput(pair.getX(), targetVector);
-				for (int i = 0; i < dout.length; i++) {
-					if (i != pair.getY()) dout[i] = 0;
-				}
-				actionListNet.calculateGradient(dout);
-				double[] tempGradient = actionListNet.getWeightBiasGradient();
-				gradient = (gradient == null ? tempGradient : UtilMethods.vectorAddition(gradient, tempGradient));
-				n++;
-			}
-			if (gradient != null) {
-				for (int i = 0; i < gradient.length; i++) {
-					gradient[i] /= n;
-				}
-				gradient = learneraw.adaptGradientVector(gradient);
-				actionListNet.applyWeightsBiasGradient(gradient, regularisation);
-			}
+
 			betterDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
 			betterActionHistory = new ArrayList<Pair<double[], Integer>>();
 			worseDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
@@ -521,13 +542,15 @@ public class QwintoSimulation {
 		}
 		while (true) {
 			int numberOfMatches = numberOfMatchesInit; // + generation / 10;// + generation*2;
-			if (numberOfMatches > 10000) numberOfMatches = 10000;
+			if (numberOfMatches > 10000)
+				numberOfMatches = 10000;
 			double[] mean_scores = new double[players.length];
 			double[] win_rate = new double[players.length];
 			double[][] mean_scores_vs = new double[players.length][3];
 			double[][] win_rate_vs = new double[players.length][3];
 			for (int i = 0; i < players.length; i++) {
-				QwinPlayer[] qPlayers = new QwinPlayer[] { players[i], new QwinPlayerExpertETest2(new Random(init.nextLong())) };
+				QwinPlayer[] qPlayers = new QwinPlayer[] { players[i],
+						new QwinPlayerExpertETest2(new Random(init.nextLong())) };
 				int[][] scores = simulateMatches(qPlayers, numberOfMatches, false);
 				double sum = 0;
 				double wins = 0;
@@ -615,7 +638,8 @@ public class QwintoSimulation {
 			for (int i = royalClubSize + 1; i < players.length; i++) {
 				int firstIndex = init.nextInt(royalClubSize);
 				int secondIndex = init.nextInt(royalClubSize - 1);
-				if (firstIndex <= secondIndex) secondIndex++;
+				if (firstIndex <= secondIndex)
+					secondIndex++;
 				DNA firstDNA = players[firstIndex].getDNA();
 				DNA secondDNA = players[secondIndex].getDNA();
 				DNA newDNA = EvolutionMethods.recombineXOR(firstDNA, secondDNA);
@@ -634,7 +658,10 @@ public class QwintoSimulation {
 			System.out.println("vs Expert2\t" + mean_scores_vs[0][0] + "\t" + win_rate_vs[0][0]);
 			if (generation % 10 == 0) {
 				try {
-					players[0].getDNA().saveGeneValuesToFile(new File("Generation" + generation + "_" + mean_scores[0] + ".txt"), "Generation " + generation + "\nBest avg score\t" + mean_scores[0] + "\nNN-Setup\n" + players[0].getName() + "\n");
+					players[0].getDNA().saveGeneValuesToFile(
+							new File("Generation" + generation + "_" + mean_scores[0] + ".txt"),
+							"Generation " + generation + "\nBest avg score\t" + mean_scores[0] + "\nNN-Setup\n"
+									+ players[0].getName() + "\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -653,7 +680,7 @@ public class QwintoSimulation {
 
 	public static void playerEvolutionAvA() {
 		int numberOfMatchesInit = 50;
-		int populationSize = 10;
+		int populationSize = 20;
 		int royalClubSize = 5;
 		int generation = 0;
 		Random init = new Random();
@@ -665,7 +692,8 @@ public class QwintoSimulation {
 		}
 		while (true) {
 			int numberOfMatches = numberOfMatchesInit + generation / 2;// + generation*2;
-			if (numberOfMatches > 10000) numberOfMatches = 10000;
+			if (numberOfMatches > 10000)
+				numberOfMatches = 10000;
 			double[] mean_scores = new double[players.length];
 			double[] win_rate = new double[players.length];
 			for (int i = 0; i < players.length; i++) {
@@ -722,7 +750,8 @@ public class QwintoSimulation {
 			for (int i = royalClubSize + 1; i < players.length; i++) {
 				int firstIndex = init.nextInt(royalClubSize);
 				int secondIndex = init.nextInt(royalClubSize - 1);
-				if (firstIndex <= secondIndex) secondIndex++;
+				if (firstIndex <= secondIndex)
+					secondIndex++;
 				DNA firstDNA = players[firstIndex].getDNA();
 				DNA secondDNA = players[secondIndex].getDNA();
 				DNA newDNA = EvolutionMethods.recombineXOR(firstDNA, secondDNA);
@@ -739,7 +768,10 @@ public class QwintoSimulation {
 			System.out.println("third\t" + mean_scores[2] + "\t" + win_rate[2]);
 			if (generation % 10 == 0) {
 				try {
-					players[0].getDNA().saveGeneValuesToFile(new File("V2 Generation" + generation + "_" + mean_scores[0] + ".txt"), "Generation " + generation + "\nBest avg score\t" + mean_scores[0] + "\nNN-Setup\n" + players[0].getName() + "\n");
+					players[0].getDNA().saveGeneValuesToFile(
+							new File("V2 Generation" + generation + "_" + mean_scores[0] + ".txt"),
+							"Generation " + generation + "\nBest avg score\t" + mean_scores[0] + "\nNN-Setup\n"
+									+ players[0].getName() + "\n");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -764,14 +796,17 @@ public class QwintoSimulation {
 			int winScore = scores[0][i];
 			boolean draw = true;
 			for (int k = 1; k < qPlayers.length; k++) {
-				if (scores[k][i] != winScore) draw = false;
+				if (scores[k][i] != winScore)
+					draw = false;
 				if (scores[k][i] > winScore) {
 					winScore = scores[k][i];
 					winnerId = k;
 				}
 			}
-			if (draw) draws++;
-			else res[winnerId][2]++;
+			if (draw)
+				draws++;
+			else
+				res[winnerId][2]++;
 		}
 		for (int k = 0; k < qPlayers.length; k++) {
 			System.out.println("" + (k + 1) + ". Player (" + qPlayers[k].getName() + ")");

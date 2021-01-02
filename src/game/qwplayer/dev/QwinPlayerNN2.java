@@ -16,12 +16,16 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 	
 	private ArrayList<Pair<double[], Integer>> rndDiceThrowHistory;
 	private ArrayList<Pair<double[], Integer>> rndActionHistory;
+	private ArrayList<Pair<double[], Integer>> fullDiceThrowHistory;
+	private ArrayList<Pair<double[], Integer>> fullActionHistory;
 	
 	public QwinPlayerNN2(Random rnd) {
 		super(rnd);
 		initNets();
 		rndDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
 		rndActionHistory = new ArrayList<Pair<double[], Integer>>();
+		fullDiceThrowHistory = new ArrayList<Pair<double[], Integer>>(); 
+		fullActionHistory = new ArrayList<Pair<double[], Integer>>();   
 	}
 	
 	@Override
@@ -29,6 +33,8 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 		super.reset(resetRnd);
 		rndDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
 		rndActionHistory = new ArrayList<Pair<double[], Integer>>();
+		fullDiceThrowHistory = new ArrayList<Pair<double[], Integer>>(); 
+		fullActionHistory = new ArrayList<Pair<double[], Integer>>();   
 	}
 	
 	private void initNets() {
@@ -42,18 +48,26 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 		actionListNet.addBlock(100, 28, true, new AF_ReLU(1.0/100.0));
 		actionListNet.setAllWeightsRandom(rnd);*/
 		diceThrowNet = new FeedForwardNetwork();
-		diceThrowNet.addBlock(55, 60, true, Activation.RELU);
-		diceThrowNet.addBlock(60, 7, true, Activation.SIGMOID);
+		diceThrowNet.addBlock(55, 60, true, Activation.SIN);
+		diceThrowNet.addBlock(60, 7, true, Activation.SIN);
 		diceThrowNet.setAllWeightsRandom(rnd);
 		actionListNet = new FeedForwardNetwork();
-		actionListNet.addBlock(76, 120, true, Activation.RELU);
-		actionListNet.addBlock(120, 120, true, Activation.RELU);
+		actionListNet.addBlock(76, 120, true, Activation.SIN);
+		actionListNet.addBlock(120, 120, true, Activation.SIN);
 		actionListNet.addBlock(120, 28, true,  Activation.SIGMOID);
 		actionListNet.setAllWeightsRandom(rnd);
 	}
 	
+	public ArrayList<Pair<double[], Integer>> getFullDiceThrowHistory(){
+		return fullDiceThrowHistory;
+	}
+	
 	public ArrayList<Pair<double[], Integer>> getRndDiceThrowHistory(){
 		return rndDiceThrowHistory;
+	}
+	
+	public ArrayList<Pair<double[], Integer>> getFullActionHistory(){
+		return fullActionHistory;
 	}
 	
 	public ArrayList<Pair<double[], Integer>> getRndActionHistory(){
@@ -129,14 +143,19 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 	}
 	
 	public DiceThrow getDiceThrowRnd(double probabilityRandom) {
-		
+		double[] diceThrowFeatures = new double[55];
+		fillWithDiceThrowNetFeatures(diceThrowFeatures);
 		if (rnd.nextDouble() < probabilityRandom) {
 			int throwFlag = rnd.nextInt(7);
-			double[] diceThrowFeatures = new double[55];
-			fillWithDiceThrowNetFeatures(diceThrowFeatures);
 			rndDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, throwFlag));
+			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, throwFlag));
 			return DiceThrow.flagToDiceThrow(throwFlag);
-		} else return getDiceThrow();
+		} else {
+			DiceThrow dt = getDiceThrow();
+			int flag = dt.getDiceThrowFlag();
+			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, flag));
+			return dt;
+		}
 		
 		
 		/*
@@ -170,15 +189,27 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 	}
 	
 	public int[] getActionFlagListRnd(double probabilityRandom, int diceNumber, DiceThrow thrown, boolean untilRethrow) {
+		double[] actionListFeatures = new double[76];
+		fillWithActionListNetFeatures(actionListFeatures, diceNumber, thrown);
 		if (rnd.nextDouble() < probabilityRandom) {
 			int[] permutation = randomPermutation(28);
 			int validAction = getFirstValidActionIndex(permutation, thrown, diceNumber, untilRethrow);
-			double[] actionListFeatures = new double[76];
-			fillWithActionListNetFeatures(actionListFeatures, diceNumber, thrown);
+			
 			// validAction == -1 bedeutet Misthrow. Das Netzwerk soll nichts lernen, wenn es die geworfene Zahl gar nicht eintragen kann
-			if (validAction > -1) rndActionHistory.add(new Pair<double[], Integer>(actionListFeatures, validAction));
+			if (validAction > -1) {
+				rndActionHistory.add(new Pair<double[], Integer>(actionListFeatures, validAction));
+				fullActionHistory.add(new Pair<double[], Integer>(actionListFeatures, validAction));
+			}
 			return permutation;
-		} else return getActionFlagList(diceNumber, thrown);
+		} else {
+			int[] afl = getActionFlagList(diceNumber, thrown);
+			int validAction = getFirstValidActionIndex(afl, thrown, diceNumber, untilRethrow);
+			if (validAction > -1) {
+				rndActionHistory.add(new Pair<double[], Integer>(actionListFeatures, validAction));
+				fullActionHistory.add(new Pair<double[], Integer>(actionListFeatures, validAction));
+			}
+			return getActionFlagList(diceNumber, thrown);
+		}
 		
 		
 		/*int[] permutation = null;

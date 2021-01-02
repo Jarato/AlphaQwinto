@@ -19,8 +19,8 @@ public class QwinPlayerNN extends QwinPlayerEvo{
 	}
 	
 	private void initNets() {
-		diceThrowNet = new NeuralLayerNet(NeuralLayerNet.RELU,55, 100, 7);
-		actionListNet = new NeuralLayerNet(NeuralLayerNet.RELU,76, 200, 200, 28);
+		diceThrowNet = new NeuralLayerNet(NeuralLayerNet.TANH,55, 100, 7);
+		actionListNet = new NeuralLayerNet(NeuralLayerNet.TANH,76, 200, 200, 28);
 	}
 	
 	@Override
