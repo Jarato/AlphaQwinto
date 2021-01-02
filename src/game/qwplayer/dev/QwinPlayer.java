@@ -51,36 +51,46 @@ public abstract class QwinPlayer {
 
 
 	/**
-	 * ReThrowDice<br>
-	 * RedPos1<br>
-	 * RedPos2<br>
-	 * RedPos3<br>
-	 * RedPos4<br>
-	 * RedPos5<br>
-	 * RedPos6<br>
-	 * RedPos7<br>
-	 * RedPos8<br>
-	 * RedPos9<br>
-	 * YellowPos1<br>
-	 * YellowPos2<br>
-	 * YellowPos3<br>
-	 * YellowPos4<br>
-	 * YellowPos5<br>
-	 * YellowPos6<br>
-	 * YellowPos7<br>
-	 * YellowPos8<br>
-	 * YellowPos9<br>
-	 * PurplePos1<br>
-	 * PurplePos2<br>
-	 * PurplePos3<br>
-	 * PurplePos4<br>
-	 * PurplePos5<br>
-	 * PurplePos6<br>
-	 * PurplePos7<br>
-	 * PurplePos8<br>
-	 * PurplePos9<br>
+	 * 0  ReThrowDice<br>
+	 * 1  NotEntering<br>
+	 * 2  Misthrow<br>
+	 * 3  RedPos1<br>
+	 * 4  RedPos2<br>
+	 * 5  RedPos3<br>
+	 * 6  RedPos4<br>
+	 * 7  RedPos5<br>
+	 * 8  RedPos6<br>
+	 * 9  RedPos7<br>
+	 * 10 RedPos8<br>
+	 * 11  RedPos9<br>
+	 * 12 YellowPos1<br>
+	 * 13 YellowPos2<br>
+	 * 14 YellowPos3<br>
+	 * 15 YellowPos4<br>
+	 * 16 YellowPos5<br>
+	 * 17 YellowPos6<br>
+	 * 18 YellowPos7<br>
+	 * 19 YellowPos8<br>
+	 * 20 YellowPos9<br>
+	 * 21 PurplePos1<br>
+	 * 22 PurplePos2<br>
+	 * 23 PurplePos3<br>
+	 * 24 PurplePos4<br>
+	 * 25 PurplePos5<br>
+	 * 26 PurplePos6<br>
+	 * 27 PurplePos7<br>
+	 * 28 PurplePos8<br>
+	 * 29 PurplePos9<br>
 	 */
 	public abstract int[] getActionFlagList(int diceNumber, DiceThrow thrown);
+	
+	
+	public int getActionFlag(int diceNumber, DiceThrow roll, boolean reThrowable) {
+		int[] actionFlagList = getActionFlagList(diceNumber, roll);
+		
+		
+		return 0;
+	}
 	
 	public abstract String getName();
 }

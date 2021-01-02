@@ -82,6 +82,11 @@ public class QwinPaper {
 		reCalculateScore = true;
 	}
 	
+	public void removeMisthrow() {
+		numMisthrows--;
+		reCalculateScore = true;
+	}
+	
 	public int calculateScore() {
 		if (!reCalculateScore) return lastScore;
 		int score = 0;
