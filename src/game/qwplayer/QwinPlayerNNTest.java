@@ -7,12 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
 
-import game.DiceThrow;
-import game.qwplayer.dev.QwinPlayerEvo;
+import game.DiceRoll;
+import game.qwplayer.dev.QwinPlayerEvo_t;
 import pdf.ai.dna.DNA;
 import pdf.ai.nnetwork.NeuralLayerNet;
 
-public class QwinPlayerNNTest extends QwinPlayerEvo{
+public class QwinPlayerNNTest extends QwinPlayerEvo_t{
 	private NeuralLayerNet diceThrowNet;
 	private NeuralLayerNet actionListNet;
 	
@@ -69,7 +69,7 @@ public class QwinPlayerNNTest extends QwinPlayerEvo{
 	}
 
 	@Override
-	public DiceThrow getDiceThrow() {
+	public DiceRoll getDiceThrow() {
 		double[] input = new double[55];
 		fillWithPaperFeatures(input);
 		diceThrowNet.setInputValues(input);
@@ -83,11 +83,11 @@ public class QwinPlayerNNTest extends QwinPlayerEvo{
 				bestIndex = i;
 			}
 		}
-		return DiceThrow.flagToDiceThrow(bestIndex);
+		return DiceRoll.flagToDiceThrow(bestIndex);
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		double[] input = new double[76];
 		fillWithPaperFeatures(input);
 		input[55] = (thrown.red?1:0);

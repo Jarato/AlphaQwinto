@@ -21,12 +21,13 @@ import game.qwplayer.QwinPlayerNN2Test;
 import game.qwplayer.QwinPlayerNNTest;
 import game.qwplayer.QwinPlayerNNTestOld;
 import game.qwplayer.QwinPlayerRandom;
-import game.qwplayer.dev.QwinPlayer;
-import game.qwplayer.dev.QwinPlayerEvo;
+import game.qwplayer.dev.QwinPlayer_t;
+import game.qwplayer.dev.QwinPlayerEvo_t;
 import game.qwplayer.dev.QwinPlayerExpertEvo;
+import game.qwplayer.dev.QwinPlayerLA_NNEval;
 import game.qwplayer.dev.QwinPlayerNN;
 import game.qwplayer.dev.QwinPlayerNN2;
-import game.qwplayer.dev.QwinPlayerRnd;
+import game.qwplayer.dev.QwinPlayerRnd_t;
 import model.BaseBlock;
 import model.FeedForwardNetwork;
 import model.learner.GradientDescent;
@@ -40,8 +41,8 @@ import pdf.util.UtilMethods;
 
 public class QwintoSimulation {
 	public static void main(String[] args) {
-		// simpleMatch();
-		 NNPlayer1v1MultiThreadMatcher(1);
+		simpleMatch();
+		//NNPlayer1v1MultiThreadMatcher(1);
 		// runNNPlayer1v1Experiments();
 		// playerEvolutionAvA();
 		//NN2Player1v1Backprop(4);
@@ -90,7 +91,7 @@ public class QwintoSimulation {
 			th3.start();
 			Thread th4 = new MatchMultiThreader("4", tg);
 			th4.start();
-			QwinPlayer[] testP = new QwinPlayer[2];
+			QwinPlayer_t[] testP = new QwinPlayer_t[2];
 			QwinPlayerNN2 testNN2 = new QwinPlayerNN2(new Random(init.nextLong()));
 			testNN2.setDiceThrowNet(MatchMultiThreader.diceThrowNet.copy());
 			testNN2.setActionListNet(MatchMultiThreader.actionListNet.copy());
@@ -276,7 +277,7 @@ public class QwintoSimulation {
 		}
 	}
 
-	private static int[][] simulateMatches(QwinPlayer[] players, int iterations, boolean print) {
+	private static int[][] simulateMatches(QwinPlayer_t[] players, int iterations, boolean print) {
 		if (print)
 			System.out.println(
 					"Simulation of " + iterations + " matches between " + players.length + " players started.");
@@ -303,8 +304,8 @@ public class QwintoSimulation {
 
 	public static void simpleMatch() {
 		Random init = new Random();
-		QwinPlayer[] qPlayers = new QwinPlayer[2];
-		qPlayers[0] = new QwinPlayerNN2Test(init);
+		QwinPlayer_t[] qPlayers = new QwinPlayer_t[2];
+		qPlayers[0] = new QwinPlayerLA_NNEval(init);
 		qPlayers[1] = new QwinPlayerExpertETest2(init);
 		QwintoMatch match = new QwintoMatch(new Random(init.nextLong()), qPlayers);
 		match.calculateMatch(true);
@@ -316,6 +317,23 @@ public class QwintoSimulation {
 		}
 	}
 
+	public static void QwinPlayerLA_1v1_Backprop() {
+		double regularisation = 0.001;
+		int numberOfMatches = 10000;
+		int numberOfLearningSteps = 10;
+		Random init = new Random();
+		QwinPlayerLA_NNEval initPlayer = new QwinPlayerLA_NNEval(new Random(init.nextLong()));	
+		FeedForwardNetwork evalNetwork = initPlayer.getEvalNetwork();
+		ArrayList<Pair<double[], Integer>> fullPaperScoreHistory = new ArrayList<Pair<double[], Integer>>();
+		
+		Learner learner = new MomentumDescent(0.01, 0.9);
+		
+		int step = 0;
+		while(true) {
+			
+		}
+	}
+	
 	public static void NN2Player1v1Backprop(int experimentNumber) {
 		double randomPlayPercent = 0.5;
 		double regularisation = 0.0005;
@@ -371,7 +389,7 @@ public class QwintoSimulation {
 				n2 = betterActionHistory.size();
 			}
 
-			QwinPlayer[] testP = new QwinPlayer[2];
+			QwinPlayer_t[] testP = new QwinPlayer_t[2];
 			QwinPlayerNN2 testNN2 = new QwinPlayerNN2(new Random(init.nextLong()));
 			testNN2.setDiceThrowNet(diceThrowNet);
 			testNN2.setActionListNet(actionListNet);
@@ -534,7 +552,7 @@ public class QwintoSimulation {
 		int royalClubSize = 15;
 		int generation = 0;
 		Random init = new Random();
-		QwinPlayerEvo[] players = new QwinPlayerEvo[populationSize];
+		QwinPlayerEvo_t[] players = new QwinPlayerEvo_t[populationSize];
 		double mutationrate = 0.01;
 		// init population
 		for (int i = 0; i < populationSize; i++) {
@@ -549,7 +567,7 @@ public class QwintoSimulation {
 			double[][] mean_scores_vs = new double[players.length][3];
 			double[][] win_rate_vs = new double[players.length][3];
 			for (int i = 0; i < players.length; i++) {
-				QwinPlayer[] qPlayers = new QwinPlayer[] { players[i],
+				QwinPlayer_t[] qPlayers = new QwinPlayer_t[] { players[i],
 						new QwinPlayerExpertETest2(new Random(init.nextLong())) };
 				int[][] scores = simulateMatches(qPlayers, numberOfMatches, false);
 				double sum = 0;
@@ -563,7 +581,7 @@ public class QwintoSimulation {
 				mean_scores_vs[i][0] += sum / numberOfMatches;
 				mean_scores[i] += sum / numberOfMatches;
 
-				qPlayers = new QwinPlayer[] { players[i], new QwinPlayerRandom(new Random(init.nextLong())) };
+				qPlayers = new QwinPlayer_t[] { players[i], new QwinPlayerRandom(new Random(init.nextLong())) };
 				scores = simulateMatches(qPlayers, numberOfMatches, false);
 				sum = 0;
 				wins = 0;
@@ -576,7 +594,7 @@ public class QwintoSimulation {
 				mean_scores_vs[i][1] += sum / numberOfMatches;
 				mean_scores[i] += sum / numberOfMatches;
 
-				qPlayers = new QwinPlayer[] { players[i], new QwinPlayerExpertETest(new Random(init.nextLong())) };
+				qPlayers = new QwinPlayer_t[] { players[i], new QwinPlayerExpertETest(new Random(init.nextLong())) };
 				scores = simulateMatches(qPlayers, numberOfMatches, false);
 				sum = 0;
 				wins = 0;
@@ -625,7 +643,7 @@ public class QwintoSimulation {
 					mean_scores[maxvIndex] = mean_scores[i];
 					mean_scores[i] = swapValue;
 					// swap player
-					QwinPlayerEvo swapPlayer = players[maxvIndex];
+					QwinPlayerEvo_t swapPlayer = players[maxvIndex];
 					players[maxvIndex] = players[i];
 					players[i] = swapPlayer;
 				}
@@ -684,7 +702,7 @@ public class QwintoSimulation {
 		int royalClubSize = 5;
 		int generation = 0;
 		Random init = new Random();
-		QwinPlayerEvo[] players = new QwinPlayerEvo[populationSize];
+		QwinPlayerEvo_t[] players = new QwinPlayerEvo_t[populationSize];
 		double mutationrate = 0.01;
 		// init population
 		for (int i = 0; i < populationSize; i++) {
@@ -698,7 +716,7 @@ public class QwintoSimulation {
 			double[] win_rate = new double[players.length];
 			for (int i = 0; i < players.length; i++) {
 				for (int j = i + 1; j < players.length; j++) {
-					QwinPlayer[] qPlayers = new QwinPlayer[] { players[i], players[j] };
+					QwinPlayer_t[] qPlayers = new QwinPlayer_t[] { players[i], players[j] };
 					int[][] scores = simulateMatches(qPlayers, numberOfMatches, false);
 					int[] sum = new int[qPlayers.length];
 					int[] wins = new int[qPlayers.length];
@@ -738,7 +756,7 @@ public class QwintoSimulation {
 					mean_scores[maxvIndex] = mean_scores[i];
 					mean_scores[i] = swapValue;
 					// swap player
-					QwinPlayerEvo swapPlayer = players[maxvIndex];
+					QwinPlayerEvo_t swapPlayer = players[maxvIndex];
 					players[maxvIndex] = players[i];
 					players[i] = swapPlayer;
 				}
@@ -785,7 +803,7 @@ public class QwintoSimulation {
 	public static void avgCompare() {
 		int numberOfIterations = 100000;
 		Random init = new Random();
-		QwinPlayer[] qPlayers = new QwinPlayer[2];
+		QwinPlayer_t[] qPlayers = new QwinPlayer_t[2];
 		qPlayers[0] = new QwinPlayerNN2Test(new Random(init.nextLong()));
 		qPlayers[1] = new QwinPlayerExpertETest2(new Random(init.nextLong()));
 		int[][] scores = simulateMatches(qPlayers, numberOfIterations, true);
@@ -829,7 +847,7 @@ public class QwintoSimulation {
 	public static void scoreDistribution() {
 		int numberOfIterations = 1000000;
 		Random init = new Random();
-		QwinPlayer[] qPlayers = new QwinPlayer[2];
+		QwinPlayer_t[] qPlayers = new QwinPlayer_t[2];
 		qPlayers[0] = new QwinPlayerExpertETest(new Random(init.nextLong()));
 		qPlayers[1] = new QwinPlayerExpertETest2(new Random(init.nextLong()));
 		int[][] scores = simulateMatches(qPlayers, numberOfIterations, true);

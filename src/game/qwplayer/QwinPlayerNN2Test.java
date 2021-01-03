@@ -8,15 +8,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import game.DiceThrow;
-import game.qwplayer.dev.QwinPlayer;
+import game.DiceRoll;
+import game.qwplayer.dev.QwinPlayer_t;
 import model.FeedForwardNetwork;
 import model.functions.AF_ReLU;
 import model.functions.AF_Sigmoid;
 import model.functions.Activation;
 import pdf.util.Pair;
 
-public class QwinPlayerNN2Test extends QwinPlayer {
+public class QwinPlayerNN2Test extends QwinPlayer_t {
 	private FeedForwardNetwork diceThrowNet;
 	private FeedForwardNetwork actionListNet;
 
@@ -53,11 +53,11 @@ public class QwinPlayerNN2Test extends QwinPlayer {
 		diceThrowNet = new FeedForwardNetwork();
 		diceThrowNet.addBlock(55, 100, false, Activation.TANH);
 		diceThrowNet.addBlock(100, 7, false, Activation.SIGMOID);
-		diceThrowNet.setAllWeightsRandom(rnd);
+		diceThrowNet.setAllWeightsRandom(rnd, 1);
 		actionListNet = new FeedForwardNetwork();
 		actionListNet.addBlock(76, 100, false, Activation.TANH);
 		actionListNet.addBlock(100, 28, false, Activation.SIGMOID);
-		actionListNet.setAllWeightsRandom(rnd);
+		actionListNet.setAllWeightsRandom(rnd, 1);
 	}
 
 	public FeedForwardNetwork getDiceThrowNet() {
@@ -91,7 +91,7 @@ public class QwinPlayerNN2Test extends QwinPlayer {
 		vector[27] = paper.getNumberOfMisthrows() * 2.0 / 3.0 - 1;
 	}
 
-	private void fillWithActionListNetFeatures(double[] vector, int thrownNumber, DiceThrow thrown) {
+	private void fillWithActionListNetFeatures(double[] vector, int thrownNumber, DiceRoll thrown) {
 		fillWithDiceThrowNetFeatures(vector);
 		vector[55] = (thrown.red ? 1 : -1);
 		vector[56] = (thrown.yellow ? 1 : -1);
@@ -100,7 +100,7 @@ public class QwinPlayerNN2Test extends QwinPlayer {
 	}
 
 	@Override
-	public DiceThrow getDiceThrow() {
+	public DiceRoll getDiceThrow() {
 		double[] input = new double[55];
 		fillWithDiceThrowNetFeatures(input);
 		diceThrowNet.prozessInput(input);
@@ -113,11 +113,11 @@ public class QwinPlayerNN2Test extends QwinPlayer {
 				bestIndex = i;
 			}
 		}
-		return DiceThrow.flagToDiceThrow(bestIndex);
+		return DiceRoll.flagToDiceThrow(bestIndex);
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		double[] input = new double[76];
 		fillWithActionListNetFeatures(input, diceNumber, thrown);
 		actionListNet.prozessInput(input);

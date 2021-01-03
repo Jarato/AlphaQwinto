@@ -2,23 +2,23 @@ package game.qwplayer;
 
 import java.util.Random;
 
-import game.DiceThrow;
-import game.qwplayer.dev.QwinPlayer;
-import game.qwplayer.dev.QwinPlayerRnd;
+import game.DiceRoll;
+import game.qwplayer.dev.QwinPlayer_t;
+import game.qwplayer.dev.QwinPlayerRnd_t;
 
-public class QwinPlayerRandom extends QwinPlayerRnd{	
+public class QwinPlayerRandom extends QwinPlayerRnd_t{	
 	public QwinPlayerRandom(Random initRnd) {
 		super(initRnd);
 	}
 	
 	@Override
-	public DiceThrow getDiceThrow() {
+	public DiceRoll getDiceThrow() {
 		int t = rnd.nextInt(7);
-		return DiceThrow.flagToDiceThrow(t);
+		return DiceRoll.flagToDiceThrow(t);
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		return randomPermutation(28);
 	}
 
@@ -28,12 +28,12 @@ public class QwinPlayerRandom extends QwinPlayerRnd{
 	}
 
 	@Override
-	public DiceThrow getDiceThrowRnd(double probabilityRandom) {
+	public DiceRoll getDiceThrowRnd(double probabilityRandom) {
 		return getDiceThrow();
 	}
 
 	@Override
-	public int[] getActionFlagListRnd(double probabilityRandom, int diceNumber, DiceThrow thrown, boolean untilRethrow) {
+	public int[] getActionFlagListRnd(double probabilityRandom, int diceNumber, DiceRoll thrown, boolean untilRethrow) {
 		return getActionFlagList(diceNumber, thrown);
 	}
 

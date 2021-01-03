@@ -4,12 +4,12 @@ import java.util.Random;
 
 public class QwinDice {
 	private Random rnd;
-	private DiceThrow diceThrow;
+	private DiceRoll diceThrow;
 	private int lastThrownNumber;
 	
 	public QwinDice(Random initRnd) {
 		rnd = initRnd;
-		diceThrow = new DiceThrow();
+		diceThrow = new DiceRoll();
 		diceThrow.red = false;
 		diceThrow.yellow = false;
 		diceThrow.purple = false;
@@ -19,7 +19,7 @@ public class QwinDice {
 		rnd = new Random();
 	}
 	
-	public DiceThrow getLastThrown() {
+	public DiceRoll getLastThrown() {
 		return diceThrow;
 	}
 	
@@ -27,7 +27,7 @@ public class QwinDice {
 		return lastThrownNumber;
 	}
 	
-	public int throwDice(DiceThrow dThrow) {
+	public int throwDice(DiceRoll dThrow) {
 		if (!dThrow.isValid()) throw new IllegalArgumentException();
 		diceThrow.red = dThrow.red;
 		diceThrow.yellow = dThrow.yellow;

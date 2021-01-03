@@ -1,17 +1,17 @@
 package game;
 
-public class DiceThrow{
+public class DiceRoll{
 	public boolean red;
 	public boolean yellow;
 	public boolean purple;
 	
-	public DiceThrow(boolean setRed, boolean setYellow, boolean setPurple) {
+	public DiceRoll(boolean setRed, boolean setYellow, boolean setPurple) {
 		red = setRed;
 		yellow = setYellow;
 		purple = setPurple;
 	}
 	
-	public DiceThrow() {
+	public DiceRoll() {
 		red = false;
 		yellow = false;
 		purple = false;
@@ -36,21 +36,21 @@ public class DiceThrow{
 		return -1;
 	}
 	
-	public static DiceThrow flagToDiceThrow(int flag) {
+	public static DiceRoll flagToDiceThrow(int flag) {
 		switch(flag) {
-			case 0: return new DiceThrow(true, false, false);
-			case 1: return new DiceThrow(false, true, false);
-			case 2: return new DiceThrow(true, true, false);
-			case 3: return new DiceThrow(false, false, true);
-			case 4: return new DiceThrow(true, false, true);
-			case 5: return new DiceThrow(false, true, true);
-			case 6: return new DiceThrow(true, true, true);
+			case 0: return new DiceRoll(true, false, false);
+			case 1: return new DiceRoll(false, true, false);
+			case 2: return new DiceRoll(true, true, false);
+			case 3: return new DiceRoll(false, false, true);
+			case 4: return new DiceRoll(true, false, true);
+			case 5: return new DiceRoll(false, true, true);
+			case 6: return new DiceRoll(true, true, true);
 		}
 		return null;
 	}
 	
 	public String toString() {
-		String str = "Throw ";
+		String str = "Roll ";
 		switch (getNumberOfDice()) {
 		case 1: {
 			if (red) return str+"RED!";

@@ -2,11 +2,11 @@ package game.qwplayer;
 
 import java.util.Random;
 
-import game.DiceThrow;
+import game.DiceRoll;
 import game.QwinDice;
-import game.qwplayer.dev.QwinPlayer;
+import game.qwplayer.dev.QwinPlayer_t;
 
-public class QwinPlayerExpert extends QwinPlayer {
+public class QwinPlayerExpert extends QwinPlayer_t {
 
 	public QwinPlayerExpert(Random rnd) {
 		super(rnd);
@@ -22,11 +22,11 @@ public class QwinPlayerExpert extends QwinPlayer {
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public DiceThrow getDiceThrow() {
-		DiceThrow t = new DiceThrow(true, true, true);
+	public DiceRoll getDiceThrow() {
+		DiceRoll t = new DiceRoll(true, true, true);
 		int[] flaglist = randomPermutation(7);
 		for (int i = 0; i < 7; i++) {
-			t = DiceThrow.flagToDiceThrow(flaglist[i]);
+			t = DiceRoll.flagToDiceThrow(flaglist[i]);
 			int fromI = 0;
 			int toI = 8;
 			switch (t.getNumberOfDice()) {
@@ -51,7 +51,7 @@ public class QwinPlayerExpert extends QwinPlayer {
 		return t;
 	}
 
-	private int numberOfHoles(DiceThrow dThrow, int fromI, int toI) {
+	private int numberOfHoles(DiceRoll dThrow, int fromI, int toI) {
 		int number = 0;
 		if (dThrow.red) {
 			int[] line = paper.getRedLine();
@@ -88,7 +88,7 @@ public class QwinPlayerExpert extends QwinPlayer {
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		int[] perm = randomPermutation(28);
 		// printActionFlagList(perm);
 		int[] lp = new int[18]; // lowest position for that number

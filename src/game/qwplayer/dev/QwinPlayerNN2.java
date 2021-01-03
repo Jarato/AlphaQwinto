@@ -3,14 +3,14 @@ package game.qwplayer.dev;
 import java.util.ArrayList;
 import java.util.Random;
 
-import game.DiceThrow;
+import game.DiceRoll;
 import model.FeedForwardNetwork;
 import model.functions.AF_ReLU;
 import model.functions.AF_Sigmoid;
 import model.functions.Activation;
 import pdf.util.Pair;
 
-public class QwinPlayerNN2 extends QwinPlayerRnd{
+public class QwinPlayerNN2 extends QwinPlayerRnd_t{
 	private FeedForwardNetwork diceThrowNet;
 	private FeedForwardNetwork actionListNet;
 	
@@ -48,14 +48,14 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 		actionListNet.addBlock(100, 28, true, new AF_ReLU(1.0/100.0));
 		actionListNet.setAllWeightsRandom(rnd);*/
 		diceThrowNet = new FeedForwardNetwork();
-		diceThrowNet.addBlock(55, 60, true, Activation.SIN);
-		diceThrowNet.addBlock(60, 7, true, Activation.SIN);
-		diceThrowNet.setAllWeightsRandom(rnd);
+		diceThrowNet.addBlock(28, 60, true, Activation.SIN);
+		diceThrowNet.addBlock(60, 7, true, Activation.SIGMOID);
+		diceThrowNet.setAllWeightsRandom(rnd, 1);
 		actionListNet = new FeedForwardNetwork();
-		actionListNet.addBlock(76, 120, true, Activation.SIN);
+		actionListNet.addBlock(49, 120, true, Activation.SIN);
 		actionListNet.addBlock(120, 120, true, Activation.SIN);
 		actionListNet.addBlock(120, 28, true,  Activation.SIGMOID);
-		actionListNet.setAllWeightsRandom(rnd);
+		actionListNet.setAllWeightsRandom(rnd, 1);
 	}
 	
 	public ArrayList<Pair<double[], Integer>> getFullDiceThrowHistory(){
@@ -95,26 +95,23 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 		int[] yellowline = paper.getYellowLine();
 		int[] purpleline = paper.getPurpleLine();
 		for (int i = 0; i < 9; i++) {
-			vector[i] = redline[i]/9.0-1;
-			vector[i+9] = yellowline[i]/9.0-1;
-			vector[i+18] = purpleline[i]/9.0-1;
-			vector[i+28] = (redline[i]==0?1:-1);
-			vector[i+37] = (yellowline[i]==0?1:-1);
-			vector[i+46] = (purpleline[i]==0?1:-1);
+			vector[i] = redline[i]/18.0;
+			vector[i+9] = yellowline[i]/18.0;
+			vector[i+18] = purpleline[i]/18.0;
 		}
 		vector[27] = paper.getNumberOfMisthrows()*2.0/3.0-1;
 	}
 	
-	private void fillWithActionListNetFeatures(double[] vector, int thrownNumber, DiceThrow thrown) {
+	private void fillWithActionListNetFeatures(double[] vector, int thrownNumber, DiceRoll thrown) {
 		fillWithDiceThrowNetFeatures(vector);
-		vector[55] = (thrown.red?1:-1);
-		vector[56] = (thrown.yellow?1:-1);
-		vector[57] = (thrown.purple?1:-1);
-		vector[57+thrownNumber] = 1;
+		vector[28] = (thrown.red?1:-1);
+		vector[29] = (thrown.yellow?1:-1);
+		vector[30] = (thrown.purple?1:-1);
+		vector[30+thrownNumber] = 1;
 	}
 	
 	
-	private int getFirstValidActionIndex(int[] actionList, DiceThrow lastThrown, int thrownNumber, boolean untilRethrow) {
+	private int getFirstValidActionIndex(int[] actionList, DiceRoll lastThrown, int thrownNumber, boolean untilRethrow) {
 		int i = 0;
 		do {
 			if (actionList[i] == 0) {
@@ -142,16 +139,16 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 		return -1;
 	}
 	
-	public DiceThrow getDiceThrowRnd(double probabilityRandom) {
-		double[] diceThrowFeatures = new double[55];
+	public DiceRoll getDiceThrowRnd(double probabilityRandom) {
+		double[] diceThrowFeatures = new double[28];
 		fillWithDiceThrowNetFeatures(diceThrowFeatures);
 		if (rnd.nextDouble() < probabilityRandom) {
 			int throwFlag = rnd.nextInt(7);
 			rndDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, throwFlag));
 			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, throwFlag));
-			return DiceThrow.flagToDiceThrow(throwFlag);
+			return DiceRoll.flagToDiceThrow(throwFlag);
 		} else {
-			DiceThrow dt = getDiceThrow();
+			DiceRoll dt = getDiceThrow();
 			int flag = dt.getDiceThrowFlag();
 			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, flag));
 			return dt;
@@ -172,8 +169,8 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 	}
 
 	@Override
-	public DiceThrow getDiceThrow() {
-		double[] input = new double[55];
+	public DiceRoll getDiceThrow() {
+		double[] input = new double[28];
 		fillWithDiceThrowNetFeatures(input);
 		diceThrowNet.prozessInput(input);
 		double[] res = diceThrowNet.getLastOutputVector();
@@ -185,11 +182,11 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 				bestIndex = i;
 			}
 		}
-		return DiceThrow.flagToDiceThrow(bestIndex);
+		return DiceRoll.flagToDiceThrow(bestIndex);
 	}
 	
-	public int[] getActionFlagListRnd(double probabilityRandom, int diceNumber, DiceThrow thrown, boolean untilRethrow) {
-		double[] actionListFeatures = new double[76];
+	public int[] getActionFlagListRnd(double probabilityRandom, int diceNumber, DiceRoll thrown, boolean untilRethrow) {
+		double[] actionListFeatures = new double[49];
 		fillWithActionListNetFeatures(actionListFeatures, diceNumber, thrown);
 		if (rnd.nextDouble() < probabilityRandom) {
 			int[] permutation = randomPermutation(28);
@@ -225,8 +222,8 @@ public class QwinPlayerNN2 extends QwinPlayerRnd{
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
-		double[] input = new double[76];
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
+		double[] input = new double[49];
 		fillWithActionListNetFeatures(input, diceNumber, thrown);
 		actionListNet.prozessInput(input);
 		double[] res = actionListNet.getLastOutputVector();

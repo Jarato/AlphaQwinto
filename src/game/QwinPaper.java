@@ -209,10 +209,16 @@ public class QwinPaper {
 		return true;
 	}
 	
+	private String ntS(int num) {
+		if (num == 0) return "__";
+		if (num < 10) return " "+num;
+		return ""+num;
+	}
+	
 	public String toString() {
-		String strRed = "#  #  "+lineRed[0]+" ["+lineRed[1]+"] "+lineRed[2]+"     "+lineRed[3]+" ["+lineRed[4]+"] "+lineRed[5]+"  "+lineRed[6]+"  "+lineRed[7]+"  "+lineRed[8];
-		String strYellow = "#  "+lineYellow[0]+"  "+lineYellow[1]+"  "+lineYellow[2]+"  "+lineYellow[3]+"  "+lineYellow[4]+"     "+lineYellow[5]+" ["+lineYellow[6]+"] "+lineYellow[7]+"  "+lineYellow[8]+"  #";
-		String strPurple = ""+linePurple[0]+"  "+linePurple[1]+" ["+linePurple[2]+"] "+linePurple[3]+"     "+linePurple[4]+"  "+linePurple[5]+"  "+linePurple[6]+"  "+linePurple[7]+" ["+linePurple[8]+"] #  #";
+		String strRed = "        "+ntS(lineRed[0])+" ["+ntS(lineRed[1])+"] "+ntS(lineRed[2])+"      "+ntS(lineRed[3])+" ["+ntS(lineRed[4])+"] "+ntS(lineRed[5])+"  "+ntS(lineRed[6])+"  "+ntS(lineRed[7])+"  "+ntS(lineRed[8]);
+		String strYellow = "    "+ntS(lineYellow[0])+"  "+ntS(lineYellow[1])+"  "+ntS(lineYellow[2])+"  "+ntS(lineYellow[3])+"  "+ntS(lineYellow[4])+"      "+ntS(lineYellow[5])+" ["+ntS(lineYellow[6])+"] "+ntS(lineYellow[7])+"  "+ntS(lineYellow[8])+"   ";
+		String strPurple = ""+ntS(linePurple[0])+"  "+ntS(linePurple[1])+" ["+ntS(linePurple[2])+"] "+ntS(linePurple[3])+"      "+ntS(linePurple[4])+"  "+ntS(linePurple[5])+"  "+ntS(linePurple[6])+"  "+ntS(linePurple[7])+" ["+ntS(linePurple[8])+"]     ";
 		String strMisthrow = "Misthrows = "+numMisthrows;
 		/*
 		 *  #  #  0 [0] 0     0 [0] 0  0  0  0

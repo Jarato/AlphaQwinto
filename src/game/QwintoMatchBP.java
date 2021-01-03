@@ -3,21 +3,21 @@ package game;
 import java.util.Random;
 
 import game.qwplayer.QwinPlayerRandom;
-import game.qwplayer.dev.QwinPlayer;
-import game.qwplayer.dev.QwinPlayerRnd;
-import game.qwplayer.dev.QwinPlayerRnd;
+import game.qwplayer.dev.QwinPlayer_t;
+import game.qwplayer.dev.QwinPlayerRnd_t;
+import game.qwplayer.dev.QwinPlayerRnd_t;
 
 public class QwintoMatchBP {
-	private QwinPlayerRnd[] player;
+	private QwinPlayerRnd_t[] player;
 	private QwinDice dice;
 	private int currentPlayerIndex;
 	private boolean matchEnd;
 	
-	public QwintoMatchBP(QwinPlayerRnd... initPlayer) {
+	public QwintoMatchBP(QwinPlayerRnd_t... initPlayer) {
 		this(new Random(), initPlayer);
 	}
 	
-	public QwintoMatchBP(Random rnd, QwinPlayerRnd... initPlayer) {
+	public QwintoMatchBP(Random rnd, QwinPlayerRnd_t... initPlayer) {
 		player = initPlayer;
 		dice = new QwinDice(rnd);
 		currentPlayerIndex = rnd.nextInt(player.length);
@@ -33,7 +33,7 @@ public class QwintoMatchBP {
 			for (int i = 0; i < player.length; i++) {
 				if (i!=currentPlayerIndex) {
 					if (print) System.out.println("Player number "+i+" ("+player[i].getName()+") thinks about entering the number.");
-					QwinPlayerRnd p = player[i];
+					QwinPlayerRnd_t p = player[i];
 					int lastThrown = dice.getLastThrownNumber();
 					int[] flagList = p.getActionFlagListRnd(randomPlayPercent, lastThrown, dice.getLastThrown(), true);
 					int res = paperEnterNumber(player[i].getPaper(), lastThrown, flagList, true, print);
@@ -50,9 +50,9 @@ public class QwintoMatchBP {
 	
 	public void currentPlayerTurn(double randomPlayPercent, boolean print) {
 		if (print) System.out.println("Turn for player "+currentPlayerIndex+" ("+player[currentPlayerIndex].getName()+")");
-		QwinPlayerRnd p = player[currentPlayerIndex];
+		QwinPlayerRnd_t p = player[currentPlayerIndex];
 		//Throw Dice
-		DiceThrow th = p.getDiceThrowRnd(randomPlayPercent);
+		DiceRoll th = p.getDiceThrowRnd(randomPlayPercent);
 		if (print) System.out.println(th);
 		int thrown = dice.throwDice(th);
 		if (print) System.out.println("the sum of the "+th.getNumberOfDice()+" dice is "+thrown+".");
@@ -90,7 +90,7 @@ public class QwintoMatchBP {
 			} else {
 				color = (flaglist[i]-1)/9;
 				boolean colorThrown = true;
-				DiceThrow thrown = dice.getLastThrown();
+				DiceRoll thrown = dice.getLastThrown();
 				switch(color) {
 				case 0: colorThrown = thrown.red;
 					break;

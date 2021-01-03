@@ -2,13 +2,13 @@ package game.qwplayer;
 
 import java.util.Random;
 
-import game.DiceThrow;
+import game.DiceRoll;
 import game.QwinDice;
-import game.qwplayer.dev.QwinPlayer;
+import game.qwplayer.dev.QwinPlayer_t;
 import pdf.ai.dna.DNA;
 import pdf.ai.dna.Evolutionizable;
 
-public class QwinPlayerExpertETest extends QwinPlayer  {
+public class QwinPlayerExpertETest extends QwinPlayer_t  {
 	private int[] lp;
 	private int[] hp;
 	private int[] fromPos;
@@ -46,11 +46,11 @@ public class QwinPlayerExpertETest extends QwinPlayer  {
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public DiceThrow getDiceThrow() {
-		DiceThrow t = new DiceThrow(true, true, true);
+	public DiceRoll getDiceThrow() {
+		DiceRoll t = new DiceRoll(true, true, true);
 		int[] flaglist = randomPermutation(7);
 		for (int i = 0; i < 7; i++) {
-			t = DiceThrow.flagToDiceThrow(flaglist[i]);
+			t = DiceRoll.flagToDiceThrow(flaglist[i]);
 			int fromI = fromPos[t.getNumberOfDice()-1];
 			int toI = toPos[t.getNumberOfDice()-1];
 			if (numberOfHoles(t, fromI, toI) > holeThreshold) return t;
@@ -58,7 +58,7 @@ public class QwinPlayerExpertETest extends QwinPlayer  {
 		return t;
 	}
 
-	private int numberOfHoles(DiceThrow dThrow, int fromI, int toI) {
+	private int numberOfHoles(DiceRoll dThrow, int fromI, int toI) {
 		int number = 0;
 		if (dThrow.red) {
 			int[] line = paper.getRedLine();
@@ -82,7 +82,7 @@ public class QwinPlayerExpertETest extends QwinPlayer  {
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		int[] perm = randomPermutation(28);
 		// printActionFlagList(perm);
 		for (int i = 0; i < lp.length; i++) {

@@ -2,11 +2,11 @@ package game.qwplayer.dev;
 
 import java.util.Random;
 
-import game.DiceThrow;
+import game.DiceRoll;
 import pdf.ai.dna.DNA;
 import pdf.ai.nnetwork.NeuralLayerNet;
 
-public class QwinPlayerNN extends QwinPlayerEvo{
+public class QwinPlayerNN extends QwinPlayerEvo_t{
 	private NeuralLayerNet diceThrowNet;
 	private NeuralLayerNet actionListNet;
 	
@@ -44,7 +44,7 @@ public class QwinPlayerNN extends QwinPlayerEvo{
 	}
 
 	@Override
-	public DiceThrow getDiceThrow() {
+	public DiceRoll getDiceThrow() {
 		double[] input = new double[55];
 		fillWithPaperFeatures(input);
 		diceThrowNet.setInputValues(input);
@@ -58,11 +58,11 @@ public class QwinPlayerNN extends QwinPlayerEvo{
 				bestIndex = i;
 			}
 		}
-		return DiceThrow.flagToDiceThrow(bestIndex);
+		return DiceRoll.flagToDiceThrow(bestIndex);
 	}
 
 	@Override
-	public int[] getActionFlagList(int diceNumber, DiceThrow thrown) {
+	public int[] getActionFlagList(int diceNumber, DiceRoll thrown) {
 		double[] input = new double[76];
 		fillWithPaperFeatures(input);
 		input[55] = (thrown.red?1:0);

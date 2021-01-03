@@ -10,7 +10,7 @@ import java.util.Random;
 import game.QwintoMatch;
 import game.QwintoMatchBP;
 import game.qwplayer.QwinPlayerExpertETest2;
-import game.qwplayer.dev.QwinPlayer;
+import game.qwplayer.dev.QwinPlayer_t;
 import game.qwplayer.dev.QwinPlayerNN2;
 import model.FeedForwardNetwork;
 import model.learner.Learner;
@@ -26,7 +26,7 @@ public class NNPlayer1v1Backprop extends Thread{
 		expNum = sExpNum+1;
 	}
 	
-	private int[][] simulateMatches(QwinPlayer[] players, int iterations, boolean print) {
+	private int[][] simulateMatches(QwinPlayer_t[] players, int iterations, boolean print) {
 		if (print) System.out.println("Simulation of " + iterations + " matches between " + players.length + " players started.");
 		Random init = new Random();
 		int[][] scores = new int[players.length][iterations];
@@ -101,7 +101,7 @@ public class NNPlayer1v1Backprop extends Thread{
 				n2 = betterActionHistory.size();
 			}
 
-			QwinPlayer[] testP = new QwinPlayer[2];
+			QwinPlayer_t[] testP = new QwinPlayer_t[2];
 			QwinPlayerNN2 testNN2 = new QwinPlayerNN2(new Random(init.nextLong()));
 			testNN2.setDiceThrowNet(diceThrowNet);
 			testNN2.setActionListNet(actionListNet);
