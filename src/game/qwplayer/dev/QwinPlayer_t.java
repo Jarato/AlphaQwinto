@@ -8,6 +8,7 @@ import game.QwinPaper;
 
 public abstract class QwinPlayer_t {
 	protected QwinPaper paper;
+	protected int numOfRounds;
 	protected Random rnd;
 	
 	public QwinPlayer_t(Random initRnd) {
@@ -17,6 +18,7 @@ public abstract class QwinPlayer_t {
 	
 	public void reset(Random resetRnd) {
 		rnd = resetRnd;
+		numOfRounds = 0;
 		paper.clear();
 	}
 	
@@ -24,9 +26,15 @@ public abstract class QwinPlayer_t {
 		return paper.calculateScore();
 	}
 	
-	public void gameEndWrapUp() {
+	public void gameEndWrapUp(boolean print) {
 		
 	}
+	
+	public void roundEndWrapUp(boolean print) {
+		numOfRounds++;
+	}
+	
+	
 	
 	public QwinPaper getPaper() {
 		return paper;

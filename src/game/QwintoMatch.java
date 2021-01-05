@@ -37,7 +37,9 @@ public class QwintoMatch {
 					int action = p.getActionFlag(lastThrown, dice.getLastThrown(), false, true);
 					if (action != 1) paperEnterNumber(player[i].getPaper(),roll, lastThrown, action, print);
 					if (print && action == 1) System.out.println("\"I don't enter the number "+lastThrown+".\"");
-					if (print) System.out.println("Paper: \n"+p.getPaper()+"\n");
+					if (print) System.out.println("Paper: \n"+p.getPaper());
+					p.roundEndWrapUp(print);
+					if (print) System.out.println();
 				}
 				//System.out.println(player[0].getPaper()+"\n");
 			}
@@ -46,10 +48,18 @@ public class QwintoMatch {
 			turn++;
 			if (matchEnd) {
 				for (int k = 0; k < player.length; k++) {
-					player[k].gameEndWrapUp();
+					player[k].gameEndWrapUp(print);
 				}
 			}
-			if (print && matchEnd) System.out.println("The match has ended. Here are the final papers: \n\n");
+			if (print && matchEnd) {
+				System.out.println("The match has ended. Here are the final papers: \n\n");
+				for (int i = 0; i < player.length; i++) {
+					System.out.println("" + (i + 1) + ". Player (" + player[i].getName() + ")");
+					System.out.println(player[i].getPaper());
+					System.out.println(player[i].getScore());
+					System.out.println();
+				}
+			}
 		}
 	}
 	
@@ -75,7 +85,9 @@ public class QwintoMatch {
 			// if not reroll
 			paperEnterNumber(p.getPaper(), th, thrown, action, print);
 		}
-		if (print) System.out.println("Paper: \n"+p.getPaper()+"\n");
+		if (print) System.out.println("Paper: \n"+p.getPaper());
+		p.roundEndWrapUp(print);
+		if (print) System.out.println();
 		return th;
 	}
 	

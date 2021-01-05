@@ -9,7 +9,7 @@ import game.qwplayer.dev.QwinPlayerNN2;
 import model.FeedForwardNetwork;
 import pdf.util.Pair;
 
-public class MatchMultiThreader extends Thread {
+public class MatchMultiThreaderNN2 extends Thread {
 	public static int count = 0;
 	public static ArrayList<Pair<double[], Integer>> betterDiceThrowHistory = new ArrayList<Pair<double[], Integer>>();
 	public static ArrayList<Pair<double[], Integer>> betterActionHistory = new ArrayList<Pair<double[], Integer>>();
@@ -20,7 +20,7 @@ public class MatchMultiThreader extends Thread {
 	public static double randomPlayPercent;
 	public static ReentrantLock lock = new ReentrantLock(true);
 
-	public MatchMultiThreader(String name, ThreadGroup tg) {
+	public MatchMultiThreaderNN2(String name, ThreadGroup tg) {
 		super(tg,name);
 	}
 	

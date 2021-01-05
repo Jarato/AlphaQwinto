@@ -38,12 +38,11 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 		double misthrowPaperEval = evaluatePaper(paper);
 		this.paper.removeMisthrow();
 		// save for all three lanes (red, yellow, purple) the best position and predicted end-score for all numbers (1-18) we can roll.
-		double[][][] lane_number_bestPosEval = new double[3][18][2];
+		double[][] lane_number_bestPosEval = new double[3][18];
 		// go through every possible number we can achieve on dicerolls
 		for (int number = 1; number < 19; number++) {
 			// add misthrow eval and -1 as position to flag the misthrow
-			lane_number_bestPosEval[0][number - 1][0] = -1;
-			lane_number_bestPosEval[0][number - 1][1] = misthrowPaperEval;
+			lane_number_bestPosEval[0][number - 1] = misthrowPaperEval;
 			// calculate optimal position for the number on each of the three lanes (red, yellow, purple)
 			// go through every lane
 			for (int lane = 0; lane < 3; lane++) {
@@ -55,9 +54,9 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 						paper.enterNumber(lane, pos, number);
 						// get eval for the paper with the new number
 						double paperEval = evaluatePaper(paper);
-						if (paperEval > lane_number_bestPosEval[lane][pos][1]) {
-							lane_number_bestPosEval[lane][number-1][1] = paperEval;
-							lane_number_bestPosEval[lane][number-1][0] = pos;
+						// if our evaluation with that new number is better than the previous evaluation, replace it
+						if (paperEval > lane_number_bestPosEval[lane][number-1]) {
+							lane_number_bestPosEval[lane][number-1] = paperEval;
 						}
 						// undo the number by putting in a 0 at the same position
 						paper.enterNumber(lane, pos, 0);
@@ -70,7 +69,7 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 		double[][] diceprobs = generateDiceProbTables();
 		// we find the best dice roll combination by looking at their expected value
 		int bestDiceRoll_flag = -1;
-		double bestDRExpectedValue = -20;
+		double bestDRExpectedValue = Double.NEGATIVE_INFINITY;
 		// go through all dice combinations via the dice-flag 0,1,2,3,4,5,6
 		for (int flag = 0; flag < 7; flag++) {
 			DiceRoll roll = DiceRoll.flagToDiceThrow(flag);
@@ -81,9 +80,9 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 			for (int number = 1; number < 19; number++) {
 				double bestEval = -20;
 				// if we roll more than one dice, we take the highest expected value over all chosen lanes for a rolled number
-				if (roll.red && lane_number_bestPosEval[0][number-1][1]>bestEval) bestEval = lane_number_bestPosEval[0][number-1][1];
-				if (roll.yellow && lane_number_bestPosEval[1][number-1][1]>bestEval) bestEval = lane_number_bestPosEval[1][number-1][1];
-				if (roll.purple && lane_number_bestPosEval[2][number-1][1]>bestEval) bestEval = lane_number_bestPosEval[2][number-1][1];
+				if (roll.red && lane_number_bestPosEval[0][number-1]>bestEval) bestEval = lane_number_bestPosEval[0][number-1];
+				if (roll.yellow && lane_number_bestPosEval[1][number-1]>bestEval) bestEval = lane_number_bestPosEval[1][number-1];
+				if (roll.purple && lane_number_bestPosEval[2][number-1]>bestEval) bestEval = lane_number_bestPosEval[2][number-1];
 				// predicted value for that number TIMES probability of roll
 				diceRollExpectedValue += bestEval*diceprobs[numDiceOfRoll-1][number-1];
 			}
@@ -104,12 +103,14 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 	
 	@Override
 	public int getActionFlag(int diceNumber, DiceRoll roll, boolean reRollable, boolean rejectable) {
-		// temporarily add a misthrow
+		// temporarily add a misthrow to get the evaluation of the paper with a misthrow
 		this.paper.misthrow();
 		double misthrowPaperEval = evaluatePaper(paper);
+		// undo the misthrow
 		this.paper.removeMisthrow();
-		double bestEval = -100;
+		double bestEval = Double.NEGATIVE_INFINITY;
 		int bestAction = -1;
+		// if this rolled number is neither rerollabled nor rejectable, then it's the rerolled number and it's our turn, so we could misthrow
 		if (!reRollable && !rejectable) {
 			bestEval = misthrowPaperEval;
 			// action flag 2 is the misthrow action
@@ -185,7 +186,7 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 							paper.enterNumber(1, pos, 0);
 						}
 						// check purple
-						if (roll.yellow && paper.isPositionValidForNumber(2, pos, putInNumber)) {
+						if (roll.purple && paper.isPositionValidForNumber(2, pos, putInNumber)) {
 							// temporarily put the number into that position
 							paper.enterNumber(2, pos, putInNumber);
 							// evaluate the paper and update our
@@ -208,6 +209,7 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 			}
 		}
 		if (bestAction != 0) recordData();
+		if (bestAction == -1) throw new IllegalArgumentException();
 		return bestAction;
 	}
 
