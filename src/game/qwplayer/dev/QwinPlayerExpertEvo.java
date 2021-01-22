@@ -33,7 +33,7 @@ public class QwinPlayerExpertEvo extends QwinPlayerEvo_t  {
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		DiceRoll t = DiceRoll.flagToDiceThrow(rnd.nextInt(7));
 		int[] flaglist = randomPermutation(7);
 		for (int k = holeThreshold; k > 0; k--) {

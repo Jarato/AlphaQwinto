@@ -54,7 +54,7 @@ public class QwinPlayerNNTestOld extends QwinPlayerEvo_t{
 	}
 
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		double[] input = new double[28];
 		int[] redline = paper.getRedLine();
 		int[] yellowline = paper.getYellowLine();
@@ -122,7 +122,7 @@ public class QwinPlayerNNTestOld extends QwinPlayerEvo_t{
 
 	@Override
 	public String getName() {
-		return "Neural Network";
+		return "NNO";
 	}
 
 	@Override

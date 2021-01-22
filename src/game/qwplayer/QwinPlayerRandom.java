@@ -12,7 +12,7 @@ public class QwinPlayerRandom extends QwinPlayerRnd_t{
 	}
 	
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		int t = rnd.nextInt(7);
 		return DiceRoll.flagToDiceThrow(t);
 	}
@@ -29,7 +29,7 @@ public class QwinPlayerRandom extends QwinPlayerRnd_t{
 
 	@Override
 	public DiceRoll getDiceThrowRnd(double probabilityRandom) {
-		return getDiceThrow();
+		return getDiceRoll();
 	}
 
 	@Override

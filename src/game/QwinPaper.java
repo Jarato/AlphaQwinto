@@ -13,6 +13,22 @@ public class QwinPaper {
 		clear();
 	}
 	
+	public QwinPaper(QwinPaper paper) {
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			lineRed[i] = paper.lineRed[i];
+			lineYellow[i] = paper.lineYellow[i];
+			linePurple[i] = paper.linePurple[i];
+		}
+		numMisthrows = paper.numMisthrows;
+		reCalculateScore = paper.reCalculateScore;
+		lastScore = paper.lastScore;
+	}
+	
+	public QwinPaper copy() {
+		return null;
+		
+	}
+	
 	public void clear() {
 		lineRed = new int[LINE_LENGTH];
 		lineYellow = new int[LINE_LENGTH];
@@ -208,6 +224,44 @@ public class QwinPaper {
 		} else throw new IllegalArgumentException("illegal color int");
 		return true;
 	}
+	
+	public int getNumberOfFullLanes() {
+		boolean redFull = true;
+		boolean yellowFull = true;
+		boolean purpleFull = true;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (lineRed[i] == 0) redFull=false;
+			if (lineYellow[i] == 0) yellowFull=false;
+			if (linePurple[i] == 0) purpleFull=false;
+		}
+		int num = 0;
+		if (redFull) num++;
+		if (yellowFull) num++;
+		if (purpleFull) num++;
+		return num;
+	}
+	
+	public int getNumberOfFullPentagonColumns() {
+		int numPent = 0;
+		if (lineRed[0] > 0 && lineYellow[1] > 0 && linePurple[2] > 0) numPent++;
+		if (lineRed[1] > 0 && lineYellow[2] > 0 && linePurple[3] > 0) numPent++;
+		if (lineRed[4] > 0 && lineYellow[5] > 0 && linePurple[6] > 0) numPent++;
+		if (lineRed[5] > 0 && lineYellow[6] > 0 && linePurple[7] > 0) numPent++;
+		if (lineRed[6] > 0 && lineYellow[7] > 0 && linePurple[8] > 0) numPent++;
+		return numPent;
+	}
+	
+	public int getNumberOfEnteredNumbers() {
+		int num = 0;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (lineRed[i] != 0) num++;
+			if (lineYellow[i] != 0) num++;
+			if (linePurple[i] != 0) num++;
+		}
+		return num;
+	}
+	
+	
 	
 	private String ntS(int num) {
 		if (num == 0) return "__";

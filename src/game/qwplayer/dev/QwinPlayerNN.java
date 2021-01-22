@@ -44,7 +44,7 @@ public class QwinPlayerNN extends QwinPlayerEvo_t{
 	}
 
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		double[] input = new double[55];
 		fillWithPaperFeatures(input);
 		diceThrowNet.setInputValues(input);

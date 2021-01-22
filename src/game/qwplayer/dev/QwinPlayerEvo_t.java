@@ -33,7 +33,7 @@ public abstract class QwinPlayerEvo_t extends QwinPlayer_t implements Evolutioni
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public abstract DiceRoll getDiceThrow();
+	public abstract DiceRoll getDiceRoll();
 
 
 	@Override

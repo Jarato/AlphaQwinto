@@ -5,7 +5,7 @@ import java.util.Random;
 public class QwinDice {
 	private Random rnd;
 	private DiceRoll diceThrow;
-	private int lastThrownNumber;
+	private int lastRolledNumber;
 	
 	public QwinDice(Random initRnd) {
 		rnd = initRnd;
@@ -23,24 +23,24 @@ public class QwinDice {
 		return diceThrow;
 	}
 	
-	public int getLastThrownNumber() {
-		return lastThrownNumber;
+	public int getLastRolledNumber() {
+		return lastRolledNumber;
 	}
 	
-	public int throwDice(DiceRoll dThrow) {
-		if (!dThrow.isValid()) throw new IllegalArgumentException();
-		diceThrow.red = dThrow.red;
-		diceThrow.yellow = dThrow.yellow;
-		diceThrow.purple = dThrow.purple;
+	public int rollDice(DiceRoll droll) {
+		if (!droll.isValid()) throw new IllegalArgumentException();
+		diceThrow.red = droll.red;
+		diceThrow.yellow = droll.yellow;
+		diceThrow.purple = droll.purple;
 		int res = 0;
-		for (int i = 0; i < dThrow.getNumberOfDice(); i++) {
+		for (int i = 0; i < droll.getNumberOfDice(); i++) {
 			res += rnd.nextInt(6)+1;
 		}
-		lastThrownNumber = res;
+		lastRolledNumber = res;
 		return res;
 	}
 	
-	public int rethrowDice() {
-		return throwDice(diceThrow);
+	public int rerollDice() {
+		return rollDice(diceThrow);
 	}
 }

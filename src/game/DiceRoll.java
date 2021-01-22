@@ -50,7 +50,7 @@ public class DiceRoll{
 	}
 	
 	public String toString() {
-		String str = "Roll ";
+		String str = "";
 		switch (getNumberOfDice()) {
 		case 1: {
 			if (red) return str+"RED!";

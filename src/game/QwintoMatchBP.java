@@ -34,7 +34,7 @@ public class QwintoMatchBP {
 				if (i!=currentPlayerIndex) {
 					if (print) System.out.println("Player number "+i+" ("+player[i].getName()+") thinks about entering the number.");
 					QwinPlayerRnd_t p = player[i];
-					int lastThrown = dice.getLastThrownNumber();
+					int lastThrown = dice.getLastRolledNumber();
 					int[] flagList = p.getActionFlagListRnd(randomPlayPercent, lastThrown, dice.getLastThrown(), true);
 					int res = paperEnterNumber(player[i].getPaper(), lastThrown, flagList, true, print);
 					if (print && res == 0) System.out.println("\"I don't want to enter the number "+lastThrown+".\"");
@@ -54,12 +54,12 @@ public class QwintoMatchBP {
 		//Throw Dice
 		DiceRoll th = p.getDiceThrowRnd(randomPlayPercent);
 		if (print) System.out.println(th);
-		int thrown = dice.throwDice(th);
+		int thrown = dice.rollDice(th);
 		if (print) System.out.println("the sum of the "+th.getNumberOfDice()+" dice is "+thrown+".");
 		int[] actionList = p.getActionFlagListRnd(randomPlayPercent, thrown, dice.getLastThrown(), true);
 		if (paperEnterNumber(p.getPaper(), thrown, actionList, true, print) == 0) { // rethrow dice
 			if (print) System.out.println("\"I want to RETHROW!\"");
-			thrown = dice.rethrowDice();
+			thrown = dice.rerollDice();
 			if (print) System.out.println("the sum of the "+th.getNumberOfDice()+" dice is "+thrown+".");
 			actionList = p.getActionFlagListRnd(randomPlayPercent, thrown, dice.getLastThrown(), false);
 			int res = paperEnterNumber(p.getPaper(), thrown, actionList, false, print);

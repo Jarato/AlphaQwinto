@@ -148,7 +148,7 @@ public class QwinPlayerNN2 extends QwinPlayerRnd_t{
 			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, throwFlag));
 			return DiceRoll.flagToDiceThrow(throwFlag);
 		} else {
-			DiceRoll dt = getDiceThrow();
+			DiceRoll dt = getDiceRoll();
 			int flag = dt.getDiceThrowFlag();
 			fullDiceThrowHistory.add(new Pair<double[], Integer>(diceThrowFeatures, flag));
 			return dt;
@@ -169,7 +169,7 @@ public class QwinPlayerNN2 extends QwinPlayerRnd_t{
 	}
 
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		double[] input = new double[28];
 		fillWithDiceThrowNetFeatures(input);
 		diceThrowNet.prozessInput(input);

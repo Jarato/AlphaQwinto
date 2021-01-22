@@ -100,7 +100,7 @@ public class QwinPlayerNN2Test extends QwinPlayer_t {
 	}
 
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		double[] input = new double[55];
 		fillWithDiceThrowNetFeatures(input);
 		diceThrowNet.prozessInput(input);
@@ -146,7 +146,7 @@ public class QwinPlayerNN2Test extends QwinPlayer_t {
 
 	@Override
 	public String getName() {
-		return "Neural Network 2";
+		return "NEURINO";
 	}
 
 }

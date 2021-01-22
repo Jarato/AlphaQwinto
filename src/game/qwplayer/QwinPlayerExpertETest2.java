@@ -45,7 +45,7 @@ public class QwinPlayerExpertETest2 extends QwinPlayerRnd_t {
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		DiceRoll t = DiceRoll.flagToDiceThrow(rnd.nextInt(7));
 		int[] flaglist = randomPermutation(7);
 		for (int k = holeThreshold; k > 0; k--) {
@@ -113,12 +113,12 @@ public class QwinPlayerExpertETest2 extends QwinPlayerRnd_t {
 
 	@Override
 	public String getName() {
-		return "Expert evolved 2";
+		return "EE2";
 	}
 
 	@Override
 	public DiceRoll getDiceThrowRnd(double probabilityRandom) {
-		return getDiceThrow();
+		return getDiceRoll();
 	}
 
 	@Override

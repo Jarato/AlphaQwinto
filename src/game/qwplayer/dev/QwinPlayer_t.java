@@ -3,12 +3,12 @@ package game.qwplayer.dev;
 import java.util.Random;
 
 import game.DiceRoll;
-import game.QwinDice;
 import game.QwinPaper;
+import game.experiments.multistat.data.PlayerData_S;
 
 public abstract class QwinPlayer_t {
 	protected QwinPaper paper;
-	protected int numOfRounds;
+	protected int numOfTurns;
 	protected Random rnd;
 	
 	public QwinPlayer_t(Random initRnd) {
@@ -18,20 +18,24 @@ public abstract class QwinPlayer_t {
 	
 	public void reset(Random resetRnd) {
 		rnd = resetRnd;
-		numOfRounds = 0;
+		numOfTurns = 0;
 		paper.clear();
+	}
+	
+	public PlayerData_S generatePlayerDataCollector() {
+		return new PlayerData_S();
 	}
 	
 	public int getScore() {
 		return paper.calculateScore();
 	}
 	
-	public void gameEndWrapUp(boolean print) {
+	public void matchEndWrapUp(QwinPaper[] allPapers) {
 		
 	}
 	
-	public void roundEndWrapUp(boolean print) {
-		numOfRounds++;
+	public void turnEndWrapUp() {
+		numOfTurns++;
 	}
 	
 	
@@ -49,7 +53,7 @@ public abstract class QwinPlayer_t {
 	 * 	5 - Purple+Yellow<br>
 	 * 	6 - purple+Yellow+Red<br>
 	 */
-	public abstract DiceRoll getDiceThrow();
+	public abstract DiceRoll getDiceRoll();
 	
 	protected int[] randomPermutation(int n) {
 		int[] res = new int[n];

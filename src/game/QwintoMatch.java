@@ -2,109 +2,129 @@ package game;
 
 import java.util.Random;
 
-import game.qwplayer.QwinPlayerRandom;
+import game.experiments.multistat.data.MatchData;
+import game.experiments.multistat.data.TurnData;
 import game.qwplayer.dev.QwinPlayer_t;
 
 public class QwintoMatch {
+	private MatchData match_data;
 	private QwinPlayer_t[] player;
 	private QwinDice dice;
 	private int currentPlayerIndex;
+	private int turn;
 	private boolean matchEnd;
-	
+
 	public QwintoMatch(QwinPlayer_t... initPlayer) {
 		this(new Random(), initPlayer);
 	}
-	
+
 	public QwintoMatch(Random rnd, QwinPlayer_t... initPlayer) {
 		player = initPlayer;
 		dice = new QwinDice(rnd);
 		currentPlayerIndex = rnd.nextInt(player.length);
 		matchEnd = false;
 	}
-	
-	public void calculateMatch(boolean print) {
-		int turn = 1;
-		while(!matchEnd) {
-			if (print) System.out.println("TURN number "+turn);
+
+	public void setRawData(MatchData match_data_s) {
+		match_data = match_data_s;
+		match_data.generateBlankePlayerDatas(player);
+	}
+
+	public void calculateMatch() {
+		turn = 1;
+		while (!matchEnd) {
+			TurnData turn_data = match_data.generateBlankTurnData();
+			turn_data.turn_number = turn;
+			turn_data.turn_of_player_idx = currentPlayerIndex;
+			turn_data.players_action = new int[player.length];
 			// the players turn
-			DiceRoll roll = currentPlayerTurn(print);
-			// go through all the other players and they can decide to enter or not to enter the number
+			DiceRoll roll = currentPlayerTurn();
+			// go through all the other players and they can decide to enter or not to enter
+			// the number
 			for (int i = 0; i < player.length; i++) {
-				if (i!=currentPlayerIndex) {
-					if (print) System.out.println("Player number "+i+" ("+player[i].getName()+") thinks about entering the number.");
+				if (i != currentPlayerIndex) {
 					QwinPlayer_t p = player[i];
-					int lastThrown = dice.getLastThrownNumber();
+					int lastThrown = dice.getLastRolledNumber();
 					int action = p.getActionFlag(lastThrown, dice.getLastThrown(), false, true);
-					if (action != 1) paperEnterNumber(player[i].getPaper(),roll, lastThrown, action, print);
-					if (print && action == 1) System.out.println("\"I don't enter the number "+lastThrown+".\"");
-					if (print) System.out.println("Paper: \n"+p.getPaper());
-					p.roundEndWrapUp(print);
-					if (print) System.out.println();
+					if (action != 1)
+						paperEnterNumber(player[i].getPaper(), roll, lastThrown, action);
+					turn_data.players_action[i] = action;
+					p.turnEndWrapUp();
 				}
-				//System.out.println(player[0].getPaper()+"\n");
+				// System.out.println(player[0].getPaper()+"\n");
 			}
-			if (print) System.out.println("\n");
-			currentPlayerIndex = (currentPlayerIndex+1)%player.length;
+			currentPlayerIndex = (currentPlayerIndex + 1) % player.length;
 			turn++;
 			if (matchEnd) {
+				QwinPaper[] allPaper = new QwinPaper[player.length];
 				for (int k = 0; k < player.length; k++) {
-					player[k].gameEndWrapUp(print);
+					allPaper[k] = player[k].getPaper();
 				}
-			}
-			if (print && matchEnd) {
-				System.out.println("The match has ended. Here are the final papers: \n\n");
-				for (int i = 0; i < player.length; i++) {
-					System.out.println("" + (i + 1) + ". Player (" + player[i].getName() + ")");
-					System.out.println(player[i].getPaper());
-					System.out.println(player[i].getScore());
-					System.out.println();
+				for (int k = 0; k < player.length; k++) {
+					player[k].matchEndWrapUp(allPaper);
+					if (match_data.players[k].special_data != null)
+						match_data.players[k].special_data.gatherData(player[k]);
 				}
+				turn--;
 			}
 		}
 	}
-	
-	public DiceRoll currentPlayerTurn(boolean print) {
-		if (print) System.out.println("Turn for player "+currentPlayerIndex+" ("+player[currentPlayerIndex].getName()+")");
+
+	public int getNumberOfTurns() {
+		return turn;
+	}
+
+	public QwinPlayer_t[] getPlayers() {
+		return player;
+	}
+
+	public DiceRoll currentPlayerTurn() {
+		TurnData turn_data = match_data.last_turn;
 		QwinPlayer_t p = player[currentPlayerIndex];
-		//Throw Dice
-		DiceRoll th = p.getDiceThrow();
-		if (print) System.out.println(th);
-		int thrown = dice.throwDice(th);
-		if (print) System.out.println("the sum of the "+th.getNumberOfDice()+" dice is "+thrown+".");
-		int action = p.getActionFlag(thrown, dice.getLastThrown(), true, false);
-		if (action < 0 || action == 1  || action == 2 || action > 29) throw new IllegalArgumentException("player chose an illegal action!");
+		// Throw Dice
+		DiceRoll th = p.getDiceRoll();
+		turn_data.diceroll_flag = th.getDiceThrowFlag();
+
+		int rolled_number = dice.rollDice(th);
+		int action = p.getActionFlag(rolled_number, dice.getLastThrown(), true, false);
+		if (action < 0 || action == 1 || action == 2 || action > 29)
+			throw new IllegalArgumentException("player chose an illegal action!");
 		if (action == 0) { // reroll dice
-			if (print) System.out.println("\"I want to reroll the dice!\"");
-			thrown = dice.rethrowDice();
-			if (print) System.out.println("the new sum of the "+th.getNumberOfDice()+" dice is "+thrown+".");
-			action = p.getActionFlag(thrown, dice.getLastThrown(), false, false);
-			if (action < 2 || action > 29) throw new IllegalArgumentException("player chose an illegal action!");
-			paperEnterNumber(p.getPaper(), th, thrown, action, print);
-			if (print && action == 2) System.out.println("\"I can't enter the number "+thrown+". It was a misthrow!\"");
+			// prepare to collect and collect raw data
+			turn_data.rolledNumbers = new int[] { rolled_number, -1 };
+			rolled_number = dice.rerollDice();
+			// collect raw data
+			turn_data.rolledNumbers[1] = rolled_number;
+			action = p.getActionFlag(rolled_number, dice.getLastThrown(), false, false);
+			if (action < 2 || action > 29)
+				throw new IllegalArgumentException("player chose an illegal action!");
+			turn_data.players_action[currentPlayerIndex] = action;
+			paperEnterNumber(p.getPaper(), th, rolled_number, action);
+
 		} else {
 			// if not reroll
-			paperEnterNumber(p.getPaper(), th, thrown, action, print);
+			// collect raw data
+			turn_data.rolledNumbers = new int[] { rolled_number };
+			turn_data.players_action[currentPlayerIndex] = action;
+			paperEnterNumber(p.getPaper(), th, rolled_number, action);
 		}
-		if (print) System.out.println("Paper: \n"+p.getPaper());
-		p.roundEndWrapUp(print);
-		if (print) System.out.println();
+		p.turnEndWrapUp();
 		return th;
 	}
-	
-	
+
 	/**
-	 * 0  ReRoll<br>
-	 * 1  Reject<br>
-	 * 2  Misthrow<br>
-	 * 3  RedPos1<br>
-	 * 4  RedPos2<br>
-	 * 5  RedPos3<br>
-	 * 6  RedPos4<br>
-	 * 7  RedPos5<br>
-	 * 8  RedPos6<br>
-	 * 9  RedPos7<br>
+	 * action flag 0 ReRoll<br>
+	 * 1 Reject<br>
+	 * 2 Misthrow<br>
+	 * 3 RedPos1<br>
+	 * 4 RedPos2<br>
+	 * 5 RedPos3<br>
+	 * 6 RedPos4<br>
+	 * 7 RedPos5<br>
+	 * 8 RedPos6<br>
+	 * 9 RedPos7<br>
 	 * 10 RedPos8<br>
-	 * 11  RedPos9<br>
+	 * 11 RedPos9<br>
 	 * 12 YellowPos1<br>
 	 * 13 YellowPos2<br>
 	 * 14 YellowPos3<br>
@@ -124,25 +144,26 @@ public class QwintoMatch {
 	 * 28 PurplePos8<br>
 	 * 29 PurplePos9<br>
 	 */
-	
+
 	/**
 	 * 
 	 * @return <br>
-	 * 0 - if rethrow dice
-	 * 1 - if the number was entered
-	 * 2 - if end of list, means misthrow
+	 *         0 - if rethrow dice 1 - if the number was entered 2 - if end of list,
+	 *         means misthrow
 	 */
-	private void paperEnterNumber(QwinPaper paper, DiceRoll roll, int number, int action_flag, boolean print) {
-		if (action_flag == 2) paper.misthrow();
+	private void paperEnterNumber(QwinPaper paper, DiceRoll roll, int number, int action_flag) {
+		if (action_flag == 2)
+			paper.misthrow();
 		else {
-			int color = (action_flag-3)/9;
-			int pos = (action_flag-3)%9;
-			boolean colorOkay = (color == 0 && roll.red) || (color == 1 && roll.yellow) || (color == 2 && roll.purple) ;
-			if (!colorOkay ||!paper.isPositionValidForNumber(color, pos, number)) throw new IllegalArgumentException("player chose an illegal action!");
-			if (print) System.out.println("\"I enter the number in the "+(color==0?"RED":(color==1?"YELLOW":"PURPLE"))+" lane on position "+(pos+1)+".\"");
+			int color = (action_flag - 3) / 9;
+			int pos = (action_flag - 3) % 9;
+			boolean colorOkay = (color == 0 && roll.red) || (color == 1 && roll.yellow) || (color == 2 && roll.purple);
+			if (!colorOkay || !paper.isPositionValidForNumber(color, pos, number))
+				throw new IllegalArgumentException("player chose an illegal action!");
 			paper.enterNumber(color, pos, number);
 		}
-		if (!matchEnd) matchEnd = paper.isEndCondition();
+		if (!matchEnd)
+			matchEnd = paper.isEndCondition();
 	}
-	
+
 }

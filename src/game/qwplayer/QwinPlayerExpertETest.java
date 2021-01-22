@@ -46,7 +46,7 @@ public class QwinPlayerExpertETest extends QwinPlayer_t  {
 	 * 6 - purple+Yellow+Red<br>
 	 */
 	@Override
-	public DiceRoll getDiceThrow() {
+	public DiceRoll getDiceRoll() {
 		DiceRoll t = new DiceRoll(true, true, true);
 		int[] flaglist = randomPermutation(7);
 		for (int i = 0; i < 7; i++) {
