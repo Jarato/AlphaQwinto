@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import game.DiceRoll;
 import game.QwinPaper;
-import game.experiments.multistat.data.AllDataRaw;
+import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.data.MatchData;
 import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
@@ -16,7 +16,11 @@ public class RawDataAnalyzer {
 		public int position;
 	}
 	
-	public static ArrayList<Pair<double[], Double>> generateTrainingData_LANNEVAL9(AllDataRaw all_matches) {
+	public static void extractDataFromRawSimulations(RawData all_matches) {
+		
+	}
+	
+	public static ArrayList<Pair<double[], Double>> generateTrainingData_LANNEVAL9(RawData all_matches) {
 		ArrayList<Pair<double[], Double>> training_data = new ArrayList<Pair<double[], Double>>();
 		for (MatchData match : all_matches.matches) {
 			for (int j = 0; j < match.players.length; j++) {
@@ -69,7 +73,7 @@ public class RawDataAnalyzer {
 		return generatePaperOfPlayerOnTurn(match, player_index, match.last_turn.turn_number-1);
 	}
 	
-	public static double calculateAverageScore_ofIndex(AllDataRaw all_matches, int player_index) {
+	public static double calculateAverageScore_ofIndex(RawData all_matches, int player_index) {
 		double avgScore = 0;
 		for (MatchData match : all_matches.matches) {
 			QwinPaper paper = generateFinalPaperOfPlayer(match, player_index);
@@ -78,7 +82,7 @@ public class RawDataAnalyzer {
 		return avgScore/all_matches.matches.size();
 	}
 	
-	public static double calculateAverageScore_allPlayers(AllDataRaw all_matches) {
+	public static double calculateAverageScore_allPlayers(RawData all_matches) {
 		int num_players = all_matches.matches.get(0).players.length;
 		double avg_score = 0;
 		for (int i = 0; i < num_players; i++) {

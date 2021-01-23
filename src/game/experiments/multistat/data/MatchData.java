@@ -16,6 +16,7 @@ public class MatchData {
 			players[i] = new PlayerData();
 			players[i].special_data = players_s[i].generatePlayerDataCollector();
 			players[i].name = players_s[i].getName();
+			players[i].player_index = i;
 		}
 	}
 	

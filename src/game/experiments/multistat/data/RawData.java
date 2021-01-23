@@ -2,7 +2,7 @@ package game.experiments.multistat.data;
 
 import java.util.ArrayList;
 
-public class AllDataRaw {
+public class RawData {
 	public ArrayList<MatchData> matches = new ArrayList<MatchData>();
 	
 	public MatchData generateBlankMatchData() {
@@ -11,9 +11,9 @@ public class AllDataRaw {
 		return blank_match;
 	}
 	
-	public static AllDataRaw collectAllData(AllDataRaw...allDataRaws) {
-		AllDataRaw rawCollected = new AllDataRaw();
-		for (AllDataRaw data : allDataRaws) {
+	public static RawData collectAllData(RawData...allDataRaws) {
+		RawData rawCollected = new RawData();
+		for (RawData data : allDataRaws) {
 			rawCollected.matches.addAll(data.matches);
 		}
 		return rawCollected;

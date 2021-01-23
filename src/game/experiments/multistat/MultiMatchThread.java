@@ -1,11 +1,11 @@
 package game.experiments.multistat;
 
 import game.QwintoMatch;
-import game.experiments.multistat.data.AllDataRaw;
+import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.matchgen.Match_Generator;
 
 public class MultiMatchThread extends Thread {
-	private AllDataRaw raw_data = null;
+	private RawData raw_data = null;
 	private Match_Generator generator;
 	private int numMatches;
 	
@@ -14,7 +14,7 @@ public class MultiMatchThread extends Thread {
 		generator = setGenerator;
 	}
 	
-	public void setRawData(AllDataRaw raw_data_s) {
+	public void setRawData(RawData raw_data_s) {
 		raw_data = raw_data_s;
 	}
 	

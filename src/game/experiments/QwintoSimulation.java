@@ -17,7 +17,7 @@ import game.QwintoMatch;
 import game.QwintoMatchBP;
 import game.experiments.multistat.MultiMatchThread;
 import game.experiments.multistat.analyze.RawDataAnalyzer;
-import game.experiments.multistat.data.AllDataRaw;
+import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.matchgen.Match_Generator;
 import game.qwplayer.QwinPlayerExpert;
 import game.qwplayer.QwinPlayerExpertETest;
@@ -52,7 +52,7 @@ public class QwintoSimulation {
 
 	public static void simpleMatch() {
 		Random init = new Random();
-		AllDataRaw raw_data = new AllDataRaw();
+		RawData raw_data = new RawData();
 		QwinPlayer_t[] qPlayers = new QwinPlayer_t[2];
 		qPlayers[0] = new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");// new QwinPlayerLA_NNEval(init);
 		((QwinPlayerLA_NNEval) qPlayers[0]).setNoiseLevel(.5);
@@ -68,17 +68,17 @@ public class QwintoSimulation {
 		RawDataAnalyzer.generateTrainingData_LANNEVAL9(raw_data);
 	}
 	
-	public static AllDataRaw multithread_matches(int number_of_matches, Match_Generator match_gen) {
+	public static RawData multithread_matches(int number_of_matches, Match_Generator match_gen) {
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		int usedThreads = numThreads - 4;
 		if (usedThreads < 1) usedThreads = 1;
-		AllDataRaw[] data_raw = new AllDataRaw[usedThreads];
+		RawData[] data_raw = new RawData[usedThreads];
 		MultiMatchThread[] threads = new MultiMatchThread[usedThreads];
 		int split_base = number_of_matches / numThreads;
 		// the rest of the datapoints
 		int split_rest = number_of_matches % numThreads;
 		for (int i = 0; i < usedThreads; i++) {
-			data_raw[i] = new AllDataRaw();
+			data_raw[i] = new RawData();
 			threads[i] = new MultiMatchThread(split_base + (split_rest > 0 ? 1 : 0), match_gen);
 			threads[i].setRawData(data_raw[i]);
 			split_rest--;
@@ -92,7 +92,7 @@ public class QwintoSimulation {
 				e.printStackTrace();
 			}
 		}
-		return AllDataRaw.collectAllData(data_raw);
+		return RawData.collectAllData(data_raw);
 	}
 
 	public static void QwinPlayerLA_1v1_Backprop_MT() {
