@@ -32,12 +32,13 @@ public class QwinPlayerNN2Test extends QwinPlayer_t {
 			int i = 0;
 			while ((line = br.readLine()) != null) {
 				if (i < weightsDT.length) {
-					weightsDT[i] = new Double(line);
+					weightsDT[i] = Double.parseDouble(line);
 				} else {
-					weightsAL[i-weightsDT.length] = new Double(line);
+					weightsAL[i-weightsDT.length] = Double.parseDouble(line);
 				}
 				i++;
 			}
+			br.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

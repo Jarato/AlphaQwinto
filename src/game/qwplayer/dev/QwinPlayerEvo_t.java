@@ -3,7 +3,6 @@ package game.qwplayer.dev;
 import java.util.Random;
 
 import game.DiceRoll;
-import game.QwinDice;
 import pdf.ai.dna.DNA;
 import pdf.ai.dna.Evolutionizable;
 

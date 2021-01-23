@@ -1,10 +1,6 @@
 package game;
 
 import java.util.Random;
-
-import game.qwplayer.QwinPlayerRandom;
-import game.qwplayer.dev.QwinPlayer_t;
-import game.qwplayer.dev.QwinPlayerRnd_t;
 import game.qwplayer.dev.QwinPlayerRnd_t;
 
 public class QwintoMatchBP {

@@ -25,9 +25,10 @@ public class QwinPlayerNNTestOld extends QwinPlayerEvo_t{
 			String line;
 			int i = 0; 
 		    while ((line = br.readLine()) != null) {
-		       geneValues[i] = new Double(line);
+		       geneValues[i] =  Double.parseDouble(line);
 		       i++;
 		    }
+		    br.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -24,11 +24,6 @@ public class QwinPaper {
 		lastScore = paper.lastScore;
 	}
 	
-	public QwinPaper copy() {
-		return null;
-		
-	}
-	
 	public void clear() {
 		lineRed = new int[LINE_LENGTH];
 		lineYellow = new int[LINE_LENGTH];
@@ -101,6 +96,31 @@ public class QwinPaper {
 	public void removeMisthrow() {
 		numMisthrows--;
 		reCalculateScore = true;
+	}
+	
+	public boolean isColorPositionBlocked(int color, int pos) {
+		int[] lane = (color == 0? lineRed : (color == 1? lineYellow : linePurple));
+		if (lane[pos] > 0) return true;
+		int i = pos;
+		while (i-1 >= 0 && lane[i] == 0) i--;
+		int numberOnLeft = lane[i];
+		int j = pos;
+		while (j+1 <= LINE_LENGTH-1 && lane[j] == 0) j++;
+		int numberOnRight = lane[j];
+		if (numberOnRight - numberOnLeft == 1) return true;
+		if (numberOnRight - numberOnLeft == 2) return !isPositionValidForNumber(color, pos, numberOnLeft+1);
+		if (numberOnRight - numberOnLeft == 3) return !(isPositionValidForNumber(color, pos, numberOnLeft+1) || isPositionValidForNumber(color, pos, numberOnRight-1));
+		return false;
+	}
+	
+	public boolean[][] generateBlockedFields() {
+		boolean[][] blocked = new boolean[3][LINE_LENGTH];
+		for (int i = 0; i < blocked.length; i++) {
+			for (int ii = 0; ii < LINE_LENGTH; ii++) {
+				blocked[i][ii] = isColorPositionBlocked(i, ii);
+			}
+		}
+		return blocked;
 	}
 	
 	public int calculateScore() {

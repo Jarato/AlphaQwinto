@@ -5,8 +5,6 @@ import java.util.Random;
 
 import game.DiceRoll;
 import model.FeedForwardNetwork;
-import model.functions.AF_ReLU;
-import model.functions.AF_Sigmoid;
 import model.functions.Activation;
 import pdf.util.Pair;
 

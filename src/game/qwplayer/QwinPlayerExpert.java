@@ -3,7 +3,6 @@ package game.qwplayer;
 import java.util.Random;
 
 import game.DiceRoll;
-import game.QwinDice;
 import game.qwplayer.dev.QwinPlayer_t;
 
 public class QwinPlayerExpert extends QwinPlayer_t {

@@ -16,10 +16,75 @@ public class RawDataAnalyzer {
 		public int position;
 	}
 	
-	public static ArrayList<Pair<double[], Double>> generateTrainingData_v9(AllDataRaw all_matches) {
-		
-		
-		return null;
+	public static ArrayList<Pair<double[], Double>> generateTrainingData_LANNEVAL9(AllDataRaw all_matches) {
+		ArrayList<Pair<double[], Double>> training_data = new ArrayList<Pair<double[], Double>>();
+		for (MatchData match : all_matches.matches) {
+			for (int j = 0; j < match.players.length; j++) {
+				QwinPaper paper = new QwinPaper();
+				ArrayList<Pair<double[], Double>> training_one_game = new ArrayList<Pair<double[], Double>>();
+				training_one_game.add(new Pair<double[], Double>(new double[83], -1.));
+				for (TurnData turn : match.turns) {
+					applyActionOnPaper(paper, turn.rolledNumbers[turn.rolledNumbers.length-1], turn.players_action[j]);
+					double[] input = new double[83];
+					int numOfTurns = turn.turn_number;
+					int[] redline = paper.getRedLine();
+					int[] yellowline = paper.getYellowLine();
+					int[] purpleline = paper.getPurpleLine();
+					boolean[][] blocked = paper.generateBlockedFields();
+					for (int i = 0; i < 9; i++) {
+						input[i] = redline[i]/18.;
+						input[i+9] = yellowline[i]/18.;
+						input[i+18] = purpleline[i]/18.;
+						input[i+27] = (redline[i]>0?1.:0.);
+						input[i+36] = (yellowline[i]>0?1.:0.);
+						input[i+45] = (purpleline[i]>0?1.:0.);
+						input[i+54] = ((blocked[0][i]&&redline[i]==0)?1.:0.);
+						input[i+63] = ((blocked[1][i]&&yellowline[i]==0)?1.:0.);
+						input[i+72] = ((blocked[2][i]&&purpleline[i]==0)?1.:0.);
+					}
+					input[81] = paper.getNumberOfMisthrows() * 1. / 4.;
+					input[82] = numOfTurns / (15. + Math.abs(numOfTurns));
+					training_one_game.add(new Pair<double[], Double>(input, -1.));
+				}
+				double final_score = paper.calculateScore();
+				for (Pair<double[], Double> instance : training_one_game) {
+					instance.setY(final_score);
+					training_data.add(instance);
+				}
+			}
+		}
+		return training_data;
+	}
+	
+	public static QwinPaper generatePaperOfPlayerOnTurn(MatchData match, int player_index, int turn_index) {
+		QwinPaper paper = new QwinPaper();
+		for (int i = 0; i < turn_index; i++) {
+			TurnData td = match.turns.get(i);
+			applyActionOnPaper(paper, td.rolledNumbers[td.rolledNumbers.length-1], td.players_action[player_index]);
+		}
+		return paper;
+	}
+	
+	public static QwinPaper generateFinalPaperOfPlayer(MatchData match, int player_index) {
+		return generatePaperOfPlayerOnTurn(match, player_index, match.last_turn.turn_number-1);
+	}
+	
+	public static double calculateAverageScore_ofIndex(AllDataRaw all_matches, int player_index) {
+		double avgScore = 0;
+		for (MatchData match : all_matches.matches) {
+			QwinPaper paper = generateFinalPaperOfPlayer(match, player_index);
+			avgScore += paper.calculateScore();
+		}
+		return avgScore/all_matches.matches.size();
+	}
+	
+	public static double calculateAverageScore_allPlayers(AllDataRaw all_matches) {
+		int num_players = all_matches.matches.get(0).players.length;
+		double avg_score = 0;
+		for (int i = 0; i < num_players; i++) {
+			avg_score += calculateAverageScore_ofIndex(all_matches, i);
+		}
+		return avg_score / num_players;
 	}
 	
 	public static void printMatch(MatchData match_data) {

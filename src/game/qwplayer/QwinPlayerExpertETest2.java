@@ -3,11 +3,8 @@ package game.qwplayer;
 import java.util.Random;
 
 import game.DiceRoll;
-import game.QwinDice;
-import game.qwplayer.dev.QwinPlayer_t;
 import game.qwplayer.dev.QwinPlayerRnd_t;
-import pdf.ai.dna.DNA;
-import pdf.ai.dna.Evolutionizable;
+
 
 public class QwinPlayerExpertETest2 extends QwinPlayerRnd_t {
 	private int[] lp;
