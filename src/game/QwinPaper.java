@@ -151,6 +151,26 @@ public class QwinPaper {
 		return lastScore;
 	}
 	
+	public boolean canEnterNumberAnywhere(int number, DiceRoll rolled_dice) {
+		if (rolled_dice.red) {
+			for (int i = 0; i < LINE_LENGTH; i++) {
+				if (isPositionValidForNumber(0, i, number)) return true;
+			}
+		}
+		if (rolled_dice.yellow) {
+			for (int i = 0; i < LINE_LENGTH; i++) {
+				if (isPositionValidForNumber(1, i, number)) return true;
+			}
+		}
+		if (rolled_dice.purple) {
+			for (int i = 0; i < LINE_LENGTH; i++) {
+				if (isPositionValidForNumber(2, i, number)) return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public boolean isPositionValidForNumber(int color, int pos, int number) {
 		if (color == 0) {
 			//aktuelle Position

@@ -10,7 +10,7 @@ public class MatchData {
 	public TurnData last_turn = null;
 	public PlayerData[] players = null;
 
-	public void generateBlankePlayerDatas(QwinPlayer_t[] players_s) {
+	public void generateBlankPlayerDatas(QwinPlayer_t[] players_s) {
 		players = new PlayerData[players_s.length];
 		for (int i = 0; i < players_s.length; i++) {
 			players[i] = new PlayerData();

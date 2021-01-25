@@ -17,7 +17,10 @@ import game.QwintoMatch;
 import game.QwintoMatchBP;
 import game.experiments.multistat.MultiMatchThread;
 import game.experiments.multistat.analyze.RawDataAnalyzer;
+import game.experiments.multistat.analyze.collect.FullRowsColumns_Collector;
+import game.experiments.multistat.analyze.collect.GameEndCondition_Collector;
 import game.experiments.multistat.analyze.collect.GameLength_Collector;
+import game.experiments.multistat.analyze.collect.Misthrow_Collector;
 import game.experiments.multistat.analyze.collect.Score_Collector;
 import game.experiments.multistat.analyze.collect.TDLANN9_Collector;
 import game.experiments.multistat.data.RawData;
@@ -109,9 +112,12 @@ public class QwintoSimulation {
 		RawData raw_data = multithread_matches(2, new LANN_Gen(init, 0.0, init_player.getEvalNetwork().copyWeightBiasVector(), 2));
 		Score_Collector score_col = new Score_Collector();
 		GameLength_Collector gamelength_col = new GameLength_Collector();
+		GameEndCondition_Collector gameend_col = new GameEndCondition_Collector();
+		Misthrow_Collector misthrow_col = new Misthrow_Collector();
+		FullRowsColumns_Collector rowcolumn_col = new FullRowsColumns_Collector();
 		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
 		RawDataAnalyzer.printMatch(raw_data.matches.get(1));
-		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col);
+		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col, gameend_col, misthrow_col, rowcolumn_col);
 		System.out.println("test");
 	}
 

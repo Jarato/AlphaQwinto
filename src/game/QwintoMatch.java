@@ -27,7 +27,7 @@ public class QwintoMatch {
 
 	public void setRawData(MatchData match_data_s) {
 		match_data = match_data_s;
-		match_data.generateBlankePlayerDatas(player);
+		match_data.generateBlankPlayerDatas(player);
 	}
 
 	public void calculateMatch() {

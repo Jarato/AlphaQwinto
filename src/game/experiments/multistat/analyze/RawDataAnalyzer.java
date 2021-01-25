@@ -1,14 +1,11 @@
 package game.experiments.multistat.analyze;
 
-import java.util.ArrayList;
 
 import game.DiceRoll;
 import game.QwinPaper;
 import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.data.MatchData;
-import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
-import pdf.util.Pair;
 
 public class RawDataAnalyzer {
 	private static class ColorPosition {

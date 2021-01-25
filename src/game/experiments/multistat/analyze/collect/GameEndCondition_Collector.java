@@ -6,44 +6,38 @@ import game.experiments.multistat.data.MatchData;
 import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
 
-public class Misthrow_Collector implements MatchStatCollecting{
-	private double[] misthrows_player;
-	private double avg_misthrows;
+public class GameEndCondition_Collector implements MatchStatCollecting {
+	private double gamesEnd_misthrow;
+	private double gamesEnd_2fulllanes;
 	
-	public double[] getAvgMisthrows_player() {
-		return misthrows_player;
+	public double getProportionGameEnd_misthrow() {
+		return gamesEnd_misthrow;
 	}
 	
-	public double getAvgerageMisthrows() {
-		return avg_misthrows;
+	public double getProportionGameEnd_2fulllanes() {
+		return gamesEnd_2fulllanes;
 	}
 	
 	@Override
 	public void preMatchSetup(MatchData match) {
-		if (misthrows_player == null) {
-			misthrows_player = new double[match.players.length];
-		}
 	}
 
 	@Override
 	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
-		
 	}
 
 	@Override
 	public void postMatchCalculation(MatchData match, QwinPaper[] papers) {
 		for (int i = 0; i < papers.length; i++) {
-			misthrows_player[i] += papers[i].getNumberOfMisthrows();
+			if (papers[i].getNumberOfFullLanes() == 2) gamesEnd_2fulllanes += 1.;
+			if (papers[i].getNumberOfMisthrows() == 4) gamesEnd_misthrow += 1.;
 		}
 	}
 
 	@Override
 	public void averageOverMatches(int number_matches) {
-		for (int i = 0; i < misthrows_player.length; i++) {
-			misthrows_player[i] /= number_matches;
-			avg_misthrows += misthrows_player[i];
-		}
-		avg_misthrows /= misthrows_player.length;
+		gamesEnd_2fulllanes /= number_matches;
+		gamesEnd_misthrow /= number_matches;
 	}
 
 }
