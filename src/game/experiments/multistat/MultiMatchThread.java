@@ -1,5 +1,7 @@
 package game.experiments.multistat;
 
+import java.util.Random;
+
 import game.QwintoMatch;
 import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.matchgen.Match_Generator;

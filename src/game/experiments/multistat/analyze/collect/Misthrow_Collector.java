@@ -1,15 +1,15 @@
-package game.experiments.multistat.analyze;
-
-import java.util.ArrayList;
+package game.experiments.multistat.analyze.collect;
 
 import game.QwinPaper;
+import game.experiments.multistat.analyze.MatchStatCollecting;
 import game.experiments.multistat.data.MatchData;
 import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
-import pdf.util.Pair;
 
-public class TrainingData_LANNEVAL9_Collector implements MatchStatCollector {
-	ArrayList<Pair<double[], Double>> training_data = new ArrayList<Pair<double[], Double>>();
+public class Misthrow_Collector implements MatchStatCollecting{
+	private double[] misthrows_player;
+	private double avg_misthrows;
+	
 	
 	@Override
 	public void preMatchSetup(MatchData match) {
@@ -18,13 +18,13 @@ public class TrainingData_LANNEVAL9_Collector implements MatchStatCollector {
 	}
 
 	@Override
-	public void processTurn4Player(TurnData turn, PlayerData player, QwinPaper paper) {
+	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void postMatchCalculation(MatchData match) {
+	public void postMatchCalculation(MatchData match, QwinPaper[] papers) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -34,5 +34,5 @@ public class TrainingData_LANNEVAL9_Collector implements MatchStatCollector {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 }

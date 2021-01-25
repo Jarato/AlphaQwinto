@@ -35,7 +35,6 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 	public void turnEndWrapUp() {
 		super.turnEndWrapUp();
 		recordData();
-		//System.out.println("Evaluation:\t" + evaluatePaper(this.paper));
 	}
 
 	private double[] read_weights_data(String weights_file) {
@@ -94,12 +93,6 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 			predictValue = (paper.calculateScore()-min)/(double)(max-min);
 		}*/
 		fillHistoryScoreData((double) this.paper.calculateScore());
-		//if (print) {
-		//	for (Pair<double[], Double> dat : paperScoreHistory) {
-			//	System.out.println(UtilMethods.arrayToString(dat.getX()) + "\t" + dat.getY());
-		//	}
-		//	System.out.println(numOfTurns);
-		//}
 	}
 
 	public void fillHistoryScoreData(Double score) {

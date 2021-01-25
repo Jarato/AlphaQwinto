@@ -15,7 +15,8 @@ public abstract class Match_Generator {
 	protected abstract QwinPlayer_t[] generatePlayers();
 	
 	public QwintoMatch generateMatch() {
-		QwintoMatch match = new QwintoMatch(generatePlayers());
+		Random init = new Random(rnd.nextLong());
+		QwintoMatch match = new QwintoMatch(init, generatePlayers());
 		return match;
 	}
 	

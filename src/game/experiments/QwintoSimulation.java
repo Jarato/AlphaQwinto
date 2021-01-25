@@ -17,7 +17,11 @@ import game.QwintoMatch;
 import game.QwintoMatchBP;
 import game.experiments.multistat.MultiMatchThread;
 import game.experiments.multistat.analyze.RawDataAnalyzer;
+import game.experiments.multistat.analyze.collect.GameLength_Collector;
+import game.experiments.multistat.analyze.collect.Score_Collector;
+import game.experiments.multistat.analyze.collect.TDLANN9_Collector;
 import game.experiments.multistat.data.RawData;
+import game.experiments.multistat.matchgen.LANN_Gen;
 import game.experiments.multistat.matchgen.Match_Generator;
 import game.qwplayer.QwinPlayerExpert;
 import game.qwplayer.QwinPlayerExpertETest;
@@ -46,7 +50,8 @@ import pdf.util.UtilMethods;
 
 public class QwintoSimulation {
 	public static void main(String[] args) {
-		simpleMatch();
+		//simpleMatch();
+		test_multimatches();
 		// QwinPlayerLA_1v1_Backprop_MT();
 	}
 
@@ -65,7 +70,10 @@ public class QwintoSimulation {
 		match.setRawData(raw_data.generateBlankMatchData());
 		match.calculateMatch();
 		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
-		RawDataAnalyzer.generateTrainingData_LANNEVAL9(raw_data);
+		TDLANN9_Collector td_col = new TDLANN9_Collector();
+		Score_Collector avgscore_col = new Score_Collector();
+		RawDataAnalyzer.extractDataFromSimulations(raw_data, td_col, avgscore_col);
+		System.out.println("average score\t" + avgscore_col.getAverageScore());
 	}
 	
 	public static RawData multithread_matches(int number_of_matches, Match_Generator match_gen) {
@@ -93,6 +101,18 @@ public class QwintoSimulation {
 			}
 		}
 		return RawData.collectAllData(data_raw);
+	}
+	
+	public static void test_multimatches() {
+		Random init = new Random(42);
+		QwinPlayerLA_NNEval init_player  =new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");
+		RawData raw_data = multithread_matches(2, new LANN_Gen(init, 0.0, init_player.getEvalNetwork().copyWeightBiasVector(), 2));
+		Score_Collector score_col = new Score_Collector();
+		GameLength_Collector gamelength_col = new GameLength_Collector();
+		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
+		RawDataAnalyzer.printMatch(raw_data.matches.get(1));
+		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col);
+		System.out.println("test");
 	}
 
 	public static void QwinPlayerLA_1v1_Backprop_MT() {
