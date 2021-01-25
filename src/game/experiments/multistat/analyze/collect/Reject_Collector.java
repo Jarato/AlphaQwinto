@@ -21,12 +21,29 @@ public class Reject_Collector implements MatchStatCollecting {
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	}
+
+	@Override
+	public void postMatchCalculation(MatchData match, QwinPaper[] papers) {
+	}
+
+	@Override
+	public void averageOverMatches(int number_matches) {
+		for (int i = 0; i < trueRejectRate_player.length; i++) {
+			trueRejectRate_player[i] /= rejectableDecisions_player[i];
+			trueRejectRate += trueRejectRate_player[i];
+		}
+		trueRejectRate /= trueRejectRate_player.length;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		DiceRoll dr = DiceRoll.flagToDiceThrow(turn.diceroll_flag);
+		int rolled_number = turn.rolledNumbers[turn.rolledNumbers.length-1];
 		for (int i = 0; i < players.length; i++) {
 			if (turn.turn_of_player_idx != i) {
 				// not this players turn, so can reject
-				DiceRoll dr = DiceRoll.flagToDiceThrow(turn.diceroll_flag);
-				int rolled_number = turn.rolledNumbers[turn.rolledNumbers.length-1];
 				if (papers[i].canEnterNumberAnywhere(rolled_number, dr)) {
 					// possible true reject
 					rejectableDecisions_player[i]++;
@@ -37,20 +54,6 @@ public class Reject_Collector implements MatchStatCollecting {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void postMatchCalculation(MatchData match, QwinPaper[] papers) {
-
-	}
-
-	@Override
-	public void averageOverMatches(int number_matches) {
-		for (int i = 0; i < trueRejectRate_player.length; i++) {
-			trueRejectRate_player[i] /= rejectableDecisions_player[i];
-			trueRejectRate += trueRejectRate_player[i];
-		}
-		trueRejectRate /= trueRejectRate_player.length;
 	}
 
 }

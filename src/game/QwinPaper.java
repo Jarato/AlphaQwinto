@@ -167,7 +167,6 @@ public class QwinPaper {
 				if (isPositionValidForNumber(2, i, number)) return true;
 			}
 		}
-		
 		return false;
 	}
 	

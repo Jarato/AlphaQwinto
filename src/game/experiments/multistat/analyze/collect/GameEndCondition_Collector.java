@@ -23,7 +23,7 @@ public class GameEndCondition_Collector implements MatchStatCollecting {
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 	}
 
 	@Override
@@ -38,6 +38,12 @@ public class GameEndCondition_Collector implements MatchStatCollecting {
 	public void averageOverMatches(int number_matches) {
 		gamesEnd_2fulllanes /= number_matches;
 		gamesEnd_misthrow /= number_matches;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

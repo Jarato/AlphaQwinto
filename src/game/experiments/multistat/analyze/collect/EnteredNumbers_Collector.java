@@ -26,7 +26,7 @@ public class EnteredNumbers_Collector implements MatchStatCollecting {
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 		
 	}
 
@@ -44,6 +44,12 @@ public class EnteredNumbers_Collector implements MatchStatCollecting {
 			avgEnteredNumbers += avgEnteredNumbers_player[i];
 		}
 		avgEnteredNumbers /= avgEnteredNumbers_player.length;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

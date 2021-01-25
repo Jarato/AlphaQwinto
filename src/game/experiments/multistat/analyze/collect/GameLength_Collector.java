@@ -18,7 +18,7 @@ public class GameLength_Collector implements MatchStatCollecting{
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 	}
 
 	@Override
@@ -29,6 +29,12 @@ public class GameLength_Collector implements MatchStatCollecting{
 	@Override
 	public void averageOverMatches(int number_matches) {
 		avg_gamelength /= number_matches;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

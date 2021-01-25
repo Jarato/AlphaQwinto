@@ -26,7 +26,7 @@ public class Misthrow_Collector implements MatchStatCollecting{
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 		
 	}
 
@@ -44,6 +44,12 @@ public class Misthrow_Collector implements MatchStatCollecting{
 			avg_misthrows += misthrows_player[i];
 		}
 		avg_misthrows /= misthrows_player.length;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

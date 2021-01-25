@@ -27,7 +27,7 @@ public class TDLANN9_Collector implements MatchStatCollecting {
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper papers[]) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper papers[]) {
 		for (int j = 0; j  < players.length ; j++) {
 			double[] input = new double[83];
 			int numOfTurns = turn.turn_number;
@@ -65,6 +65,12 @@ public class TDLANN9_Collector implements MatchStatCollecting {
 
 	@Override
 	public void averageOverMatches(int number_matches) {
+		
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
 		
 	}
 	

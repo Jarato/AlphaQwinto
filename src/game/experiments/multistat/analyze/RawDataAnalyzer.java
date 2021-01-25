@@ -25,14 +25,18 @@ public class RawDataAnalyzer {
 			}
 			// simulate game
 			for (TurnData turn : match.turns) {
+				// collect pre
+				for (MatchStatCollecting collector : collectors) {
+					collector.processPreTurn(turn, match.players, player_papers);
+				}
 				int rolled_number = turn.rolledNumbers[turn.rolledNumbers.length - 1];
 				for (int i = 0; i < player_papers.length; i++) {
 					// apply action
 					applyActionOnPaper(player_papers[i], rolled_number, turn.players_action[i]);	
 				}
-				// collect
+				// collect post
 				for (MatchStatCollecting collector : collectors) {
-					collector.processTurn(turn, match.players, player_papers);
+					collector.processPostTurn(turn, match.players, player_papers);
 				}
 			}
 			// post game

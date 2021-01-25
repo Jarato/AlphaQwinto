@@ -21,6 +21,8 @@ import game.experiments.multistat.analyze.collect.FullRowsColumns_Collector;
 import game.experiments.multistat.analyze.collect.GameEndCondition_Collector;
 import game.experiments.multistat.analyze.collect.GameLength_Collector;
 import game.experiments.multistat.analyze.collect.Misthrow_Collector;
+import game.experiments.multistat.analyze.collect.NoisedDecision_Collector;
+import game.experiments.multistat.analyze.collect.Reject_Collector;
 import game.experiments.multistat.analyze.collect.Score_Collector;
 import game.experiments.multistat.analyze.collect.TDLANN9_Collector;
 import game.experiments.multistat.data.RawData;
@@ -81,13 +83,13 @@ public class QwintoSimulation {
 	
 	public static RawData multithread_matches(int number_of_matches, Match_Generator match_gen) {
 		int numThreads = Runtime.getRuntime().availableProcessors();
-		int usedThreads = numThreads - 4;
+		int usedThreads = numThreads - 2;
 		if (usedThreads < 1) usedThreads = 1;
 		RawData[] data_raw = new RawData[usedThreads];
 		MultiMatchThread[] threads = new MultiMatchThread[usedThreads];
-		int split_base = number_of_matches / numThreads;
+		int split_base = number_of_matches / usedThreads;
 		// the rest of the datapoints
-		int split_rest = number_of_matches % numThreads;
+		int split_rest = number_of_matches % usedThreads;
 		for (int i = 0; i < usedThreads; i++) {
 			data_raw[i] = new RawData();
 			threads[i] = new MultiMatchThread(split_base + (split_rest > 0 ? 1 : 0), match_gen);
@@ -99,7 +101,6 @@ public class QwintoSimulation {
 			try {
 				threads[i].join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -107,17 +108,19 @@ public class QwintoSimulation {
 	}
 	
 	public static void test_multimatches() {
-		Random init = new Random(42);
+		Random init = new Random(2);
 		QwinPlayerLA_NNEval init_player  =new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");
-		RawData raw_data = multithread_matches(2, new LANN_Gen(init, 0.0, init_player.getEvalNetwork().copyWeightBiasVector(), 2));
+		RawData raw_data = multithread_matches(1000, new LANN_Gen(init, 0.0, init_player.getEvalNetwork().copyWeightBiasVector(), 2));
+		System.out.println("number of games recorded: "+raw_data.matches.size());
 		Score_Collector score_col = new Score_Collector();
 		GameLength_Collector gamelength_col = new GameLength_Collector();
 		GameEndCondition_Collector gameend_col = new GameEndCondition_Collector();
 		Misthrow_Collector misthrow_col = new Misthrow_Collector();
 		FullRowsColumns_Collector rowcolumn_col = new FullRowsColumns_Collector();
+		NoisedDecision_Collector noised_col = new NoisedDecision_Collector();
+		Reject_Collector reject_col = new Reject_Collector();
 		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
-		RawDataAnalyzer.printMatch(raw_data.matches.get(1));
-		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col, gameend_col, misthrow_col, rowcolumn_col);
+		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col, gameend_col, misthrow_col, rowcolumn_col, noised_col, reject_col);
 		System.out.println("test");
 	}
 

@@ -34,7 +34,7 @@ public class Score_Collector implements MatchStatCollecting{
 	}
 
 	@Override
-	public void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
 		
 	}
 
@@ -54,6 +54,12 @@ public class Score_Collector implements MatchStatCollecting{
 			average_score += avg_score_player[i];
 		}
 		average_score /= avg_score_player.length;
+	}
+
+	@Override
+	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

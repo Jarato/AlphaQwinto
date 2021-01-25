@@ -7,7 +7,8 @@ import game.experiments.multistat.data.TurnData;
 
 public interface MatchStatCollecting {
 	public abstract void preMatchSetup(MatchData match);
-	public abstract void processTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers);
+	public abstract void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers);
+	public abstract void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers);
 	public abstract void postMatchCalculation(MatchData match, QwinPaper[] papers);
 	public abstract void averageOverMatches(int number_matches);
 }
