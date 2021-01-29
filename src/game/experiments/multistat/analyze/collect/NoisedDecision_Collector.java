@@ -42,10 +42,12 @@ public class NoisedDecision_Collector implements MatchStatCollecting {
 		if (la_data[turn.turn_of_player_idx] != null) {
 			// the player of this turn can have noised decisions
 			int idx = turn.turn_of_player_idx;
+			// check if the chosen dice to roll are the same
 			if (la_data[idx].denoisedDecisions.get(la_data_currentIndex[idx]) != -(1+turn.diceroll_flag)) {
 				noisedDecisions_player_match[idx] += 1.;
 			}
 			la_data_currentIndex[idx]++;
+			// reroll decision
 			if (turn.rolledNumbers.length == 2) {
 				// actual reroll action
 				if (la_data[idx].denoisedDecisions.get(la_data_currentIndex[idx]) != 0)
@@ -65,7 +67,9 @@ public class NoisedDecision_Collector implements MatchStatCollecting {
 	@Override
 	public void postMatchCalculation(MatchData match, QwinPaper[] papers) {
 		for (int i = 0; i < noisedDecisions_player.length; i++) {
-			noisedDecisions_player_match[i] /= la_data[i].denoisedDecisions.size();
+			if (la_data[i] != null) {
+				noisedDecisions_player_match[i] /= la_data[i].denoisedDecisions.size();
+			}
 			noisedDecisions_player[i] += noisedDecisions_player_match[i];
 		}
 	}
@@ -82,8 +86,12 @@ public class NoisedDecision_Collector implements MatchStatCollecting {
 
 	@Override
 	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
+	}
+
+	@Override
+	public String printAllStats() {
 		// TODO Auto-generated method stub
-		
+		return "";
 	}
 
 }

@@ -11,4 +11,5 @@ public interface MatchStatCollecting {
 	public abstract void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers);
 	public abstract void postMatchCalculation(MatchData match, QwinPaper[] papers);
 	public abstract void averageOverMatches(int number_matches);
+	public abstract String printAllStats();
 }

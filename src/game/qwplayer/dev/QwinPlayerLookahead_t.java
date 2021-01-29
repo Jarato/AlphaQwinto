@@ -16,8 +16,6 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 	protected int numOfActualRejects;
 	protected double noiselevel = 0;
 	protected double lastNoise = 0;
-	private double numDecisions_total = 0;
-	private double numDecisions_noised = 0;
 	protected double[] actionForRolledNumber = new double[18];
 	protected double[] actionForRerolledNumber = new double[18];
 	protected double[] actionRolledNumber_denoised = new double[18];
@@ -33,10 +31,6 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 
 	public QwinPlayerLookahead_t(Random rnd) {
 		super(rnd);
-	}
-	
-	public double getNoisedActionProportion() {
-		return numDecisions_noised/numDecisions_total;
 	}
 	
 	public ArrayList<Double> getpaperEval_turn(){
@@ -161,9 +155,6 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 		double[][] res_denoised = calculateBestDiceRollandTables(no_noise_table, misthrowPaperEval_denoised);
 		actionRerolledNumber_denoised = res_denoised[1];
 		actionRolledNumber_denoised = res_denoised[2];
-		// count the numbers of decisions and the number of changed decisions caused by the noise
-		numDecisions_total++;
-		if (res[0][0] != res_denoised[0][0]) numDecisions_noised++;
 		// add the decision to the denoised decisions
 		denoisedDecisions.add(diceRollFlag_to_denoisedDecisionFlag((int)res_denoised[0][0]));
 		// return the best found dice roll combination
@@ -255,28 +246,23 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 
 	@Override
 	public int getActionFlag(int diceNumber, DiceRoll roll, boolean reRollable, boolean rejectable) {
-		numDecisions_total++;
 		if (reRollable) {
-			if (actionForRolledNumber[diceNumber - 1] != actionRolledNumber_denoised[diceNumber - 1]) numDecisions_noised++;
 			denoisedDecisions.add((int)actionRolledNumber_denoised[diceNumber - 1]);
 			return (int)actionForRolledNumber[diceNumber - 1];
 		}
 		// if this rolled number is neither rerollabled nor rejectable, then it's the
 		// rerolled number and it's our turn, so we could misthrow
 		if (!reRollable && !rejectable) {
-			if (actionForRerolledNumber[diceNumber - 1] != actionRerolledNumber_denoised[diceNumber - 1]) numDecisions_noised++;
 			denoisedDecisions.add((int)actionRerolledNumber_denoised[diceNumber - 1]);
 			return (int)actionForRerolledNumber[diceNumber - 1];
 			// bestEval = misthrowPaperEval;
 			// action flag 2 is the misthrow action
 			// bestAction = 2;
 		}
-		
 		double bestEval = Double.NEGATIVE_INFINITY;
 		double bestEval_denoised = Double.NEGATIVE_INFINITY;
 		boolean trueRejectPossible = false;
 		int bestAction = -1;
-		int bestAction_denoised = -1;
 		// if this rolled number is rejectable, then it's not our turn, we check if we
 		// want to enter a number by evaluating the paper without changing anything
 		if (rejectable) {
@@ -291,7 +277,6 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 			double rejectEval_denoised = rejectEval - lastNoise;
 			if (rejectEval_denoised > bestEval_denoised) {
 				bestEval_denoised = rejectEval_denoised;
-				bestAction_denoised = 1;
 			}
 		}
 		// go through all actions
@@ -314,12 +299,10 @@ public abstract class QwinPlayerLookahead_t extends QwinPlayer_t {
 					double paperEval_denoised = paperEval - lastNoise;
 					if (paperEval_denoised > bestEval_denoised) {
 						bestEval_denoised = paperEval_denoised;
-						bestAction_denoised = action_f;
 					}
 				}
 			}
 		}
-		if (bestAction != bestAction_denoised) numDecisions_noised++;
 		if (bestAction == -1)
 			throw new IllegalArgumentException();
 		if (rejectable && trueRejectPossible)

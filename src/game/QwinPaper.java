@@ -108,6 +108,7 @@ public class QwinPaper {
 		while (j+1 <= LINE_LENGTH-1 && lane[j] == 0) j++;
 		int numberOnRight = lane[j];
 		if (numberOnRight - numberOnLeft == 1) return true;
+		if (numberOnLeft == 18) return true;
 		if (numberOnRight - numberOnLeft == 2) return !isPositionValidForNumber(color, pos, numberOnLeft+1);
 		if (numberOnRight - numberOnLeft == 3) return !(isPositionValidForNumber(color, pos, numberOnLeft+1) || isPositionValidForNumber(color, pos, numberOnRight-1));
 		return false;

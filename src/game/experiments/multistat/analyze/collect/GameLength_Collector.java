@@ -33,8 +33,11 @@ public class GameLength_Collector implements MatchStatCollecting{
 
 	@Override
 	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public String printAllStats() {
+		return "Game length - collector\naverage game length:\t"+avg_gamelength+"\n";
 	}
 
 }

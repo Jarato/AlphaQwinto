@@ -48,8 +48,15 @@ public class Misthrow_Collector implements MatchStatCollecting{
 
 	@Override
 	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public String printAllStats() {
+		String str = "Misthrow - collector\naverage misthrows of all players:\t"+avg_misthrows+"\naverage misthrows of individual players\n";
+		for (int i = 0; i < misthrows_player.length; i++) {
+			str = str+"player "+i+":\t"+misthrows_player[i]+"\n";
+		}
+		return str;
 	}
 
 }

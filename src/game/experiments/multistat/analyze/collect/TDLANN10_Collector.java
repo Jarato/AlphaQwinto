@@ -9,7 +9,7 @@ import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
 import pdf.util.Pair;
 
-public class TDLANN9_Collector implements MatchStatCollecting {
+public class TDLANN10_Collector implements MatchStatCollecting{
 	private ArrayList<Pair<double[], Double>> training_data = new ArrayList<Pair<double[], Double>>();
 	private ArrayList<ArrayList<Pair<double[], Double>>> td_onegame = new ArrayList<ArrayList<Pair<double[], Double>>>();
 	
@@ -21,7 +21,7 @@ public class TDLANN9_Collector implements MatchStatCollecting {
 	public void preMatchSetup(MatchData match) {
 		for (int i = 0; i  < match.players.length ; i++) {
 			ArrayList<Pair<double[], Double>> p_p_history = new ArrayList<Pair<double[], Double>>();
-			p_p_history.add(new Pair<double[], Double>(new double[83], -1.));
+			p_p_history.add(new Pair<double[], Double>(new double[488], -1.));
 			td_onegame.add(p_p_history);
 		}
 	}
@@ -29,25 +29,25 @@ public class TDLANN9_Collector implements MatchStatCollecting {
 	@Override
 	public void processPostTurn(TurnData turn, PlayerData[] players, QwinPaper papers[]) {
 		for (int j = 0; j  < players.length ; j++) {
-			double[] input = new double[83];
+			double[] input = new double[488];
 			int numOfTurns = turn.turn_number;
-			int[] redline = papers[j].getRedLine();
-			int[] yellowline = papers[j].getYellowLine();
-			int[] purpleline = papers[j].getPurpleLine();
-			boolean[][] blocked = papers[j].generateBlockedFields();
+			QwinPaper paper = papers[j];
+			int[] redline = paper.getRedLine();
+			int[] yellowline = paper.getYellowLine();
+			int[] purpleline = paper.getPurpleLine();
 			for (int i = 0; i < 9; i++) {
-				input[i] = redline[i] / 18.;
-				input[i + 9] = yellowline[i] / 18.;
-				input[i + 18] = purpleline[i] / 18.;
-				input[i + 27] = (redline[i] > 0 ? 1. : 0.);
-				input[i + 36] = (yellowline[i] > 0 ? 1. : 0.);
-				input[i + 45] = (purpleline[i] > 0 ? 1. : 0.);
-				input[i + 54] = ((blocked[0][i] && redline[i] == 0) ? 1. : 0.);
-				input[i + 63] = ((blocked[1][i] && yellowline[i] == 0) ? 1. : 0.);
-				input[i + 72] = ((blocked[2][i] && purpleline[i] == 0) ? 1. : 0.);
+				if (redline[i] != 0) {
+					input[i * 18 + redline[i] - 1] = 1;
+				}
+				if (yellowline[i] != 0) {
+					input[18 * (9 + i) + yellowline[i] - 1] = 1;
+				}
+				if (purpleline[i] != 0) {
+					input[18 * (18 + i) + purpleline[i] - 1] = 1;
+				}
 			}
-			input[81] = papers[j].getNumberOfMisthrows() * 1. / 4.;
-			input[82] = numOfTurns / (15. + Math.abs(numOfTurns));
+			input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
+			input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
 			td_onegame.get(j).add(new Pair<double[], Double>(input, -1.));
 		}
 	}
@@ -77,5 +77,4 @@ public class TDLANN9_Collector implements MatchStatCollecting {
 		// TODO Auto-generated method stub
 		return "";
 	}
-	
 }

@@ -62,8 +62,19 @@ public class FullRowsColumns_Collector implements MatchStatCollecting {
 
 	@Override
 	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public String printAllStats() {
+		String str = "Full rows and full penta columns - collector\naverage full rows of all players:\t"+avgFullLanes+"\naverage full rows of individual players\n";
+		for (int i = 0; i < avgFullLanes_player.length; i++) {
+			str = str + "player "+i+":\t"+avgFullLanes_player[i]+"\n";
+		}
+		str = str+"average full pentagon columns of all players:\t"+avgFullPentaColumns+"\naverage full pentagon columns of individual players\n";
+		for (int i = 0; i < avgFullPentaColumns_player.length; i++) {
+			str = str + "player "+i+":\t"+avgFullPentaColumns_player[i]+"\n";
+		}
+		return str;
 	}
 
 }

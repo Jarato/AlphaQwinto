@@ -17,17 +17,20 @@ import game.QwintoMatch;
 import game.QwintoMatchBP;
 import game.experiments.multistat.MultiMatchThread;
 import game.experiments.multistat.analyze.RawDataAnalyzer;
+import game.experiments.multistat.analyze.collect.EnteredNumbers_Collector;
 import game.experiments.multistat.analyze.collect.FullRowsColumns_Collector;
-import game.experiments.multistat.analyze.collect.GameEndCondition_Collector;
+import game.experiments.multistat.analyze.collect.GameEnd_Collector;
 import game.experiments.multistat.analyze.collect.GameLength_Collector;
 import game.experiments.multistat.analyze.collect.Misthrow_Collector;
 import game.experiments.multistat.analyze.collect.NoisedDecision_Collector;
 import game.experiments.multistat.analyze.collect.Reject_Collector;
 import game.experiments.multistat.analyze.collect.Score_Collector;
+import game.experiments.multistat.analyze.collect.TDLANN10_Collector;
 import game.experiments.multistat.analyze.collect.TDLANN9_Collector;
 import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.matchgen.LANN_Gen;
 import game.experiments.multistat.matchgen.Match_Generator;
+import game.experiments.multistat.matchgen.Test_Gen;
 import game.qwplayer.QwinPlayerExpert;
 import game.qwplayer.QwinPlayerExpertETest;
 import game.qwplayer.QwinPlayerExpertETest2;
@@ -57,33 +60,29 @@ public class QwintoSimulation {
 	public static void main(String[] args) {
 		//simpleMatch();
 		test_multimatches();
+		//QwinPlayerLA_1v1_Backprop_new();
 		// QwinPlayerLA_1v1_Backprop_MT();
+		//QwinPlayerLA_1v1_Backprop_new();
 	}
 
 	public static void simpleMatch() {
 		Random init = new Random();
 		RawData raw_data = new RawData();
-		QwinPlayer_t[] qPlayers = new QwinPlayer_t[2];
-		qPlayers[0] = new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");// new QwinPlayerLA_NNEval(init);
-		((QwinPlayerLA_NNEval) qPlayers[0]).setNoiseLevel(.5);
-		qPlayers[1] = new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");
-		((QwinPlayerLA_NNEval) qPlayers[1]).setNoiseLevel(1.);
-		// qPlayers[2] = new QwinPlayerNN2Test(init);
-		// qPlayers[3] = new QwinPlayerNNTest(init);
-		// qPlayers[4] = new QwinPlayerNNTestOld(init);
-		QwintoMatch match = new QwintoMatch(new Random(init.nextLong()), qPlayers);
-		match.setRawData(raw_data.generateBlankMatchData());
-		match.calculateMatch();
+		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");
+		Match_Generator gen = new LANN_Gen(init, 0., init_player.getEvalNetwork().copyWeightBiasVector(), 5);
+		//QwintoMatch match = new QwintoMatch(new Random(init.nextLong()), qPlayers);
+		//match.setRawData(raw_data.generateBlankMatchData());
+		//match.calculateMatch();
 		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
-		TDLANN9_Collector td_col = new TDLANN9_Collector();
-		Score_Collector avgscore_col = new Score_Collector();
-		RawDataAnalyzer.extractDataFromSimulations(raw_data, td_col, avgscore_col);
-		System.out.println("average score\t" + avgscore_col.getAverageScore());
+		//TDLANN9_Collector td_col = new TDLANN9_Collector();
+		//Score_Collector avgscore_col = new Score_Collector();
+		//RawDataAnalyzer.extractDataFromSimulations(raw_data, td_col, avgscore_col);
+		//System.out.println("average score\t" + avgscore_col.getAverageScore());
 	}
 	
 	public static RawData multithread_matches(int number_of_matches, Match_Generator match_gen) {
 		int numThreads = Runtime.getRuntime().availableProcessors();
-		int usedThreads = numThreads - 2;
+		int usedThreads = numThreads - 1;
 		if (usedThreads < 1) usedThreads = 1;
 		RawData[] data_raw = new RawData[usedThreads];
 		MultiMatchThread[] threads = new MultiMatchThread[usedThreads];
@@ -108,52 +107,45 @@ public class QwintoSimulation {
 	}
 	
 	public static void test_multimatches() {
-		Random init = new Random(2);
-		QwinPlayerLA_NNEval init_player  =new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");
-		RawData raw_data = multithread_matches(1000, new LANN_Gen(init, 0.0, init_player.getEvalNetwork().copyWeightBiasVector(), 2));
+		Random init = new Random();
+		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");
+		Match_Generator gen = new Test_Gen(init);//new LANN_Gen(init, 0., init_player.getEvalNetwork().copyWeightBiasVector(), 5);
+		RawData raw_data = multithread_matches(30000, gen);
 		System.out.println("number of games recorded: "+raw_data.matches.size());
 		Score_Collector score_col = new Score_Collector();
 		GameLength_Collector gamelength_col = new GameLength_Collector();
-		GameEndCondition_Collector gameend_col = new GameEndCondition_Collector();
+		GameEnd_Collector gameend_col = new GameEnd_Collector();
 		Misthrow_Collector misthrow_col = new Misthrow_Collector();
 		FullRowsColumns_Collector rowcolumn_col = new FullRowsColumns_Collector();
 		NoisedDecision_Collector noised_col = new NoisedDecision_Collector();
+		EnteredNumbers_Collector number_col = new EnteredNumbers_Collector();
 		Reject_Collector reject_col = new Reject_Collector();
 		RawDataAnalyzer.printMatch(raw_data.matches.get(0));
-		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col, gameend_col, misthrow_col, rowcolumn_col, noised_col, reject_col);
-		System.out.println("test");
+		RawDataAnalyzer.extractDataFromSimulations(raw_data, score_col, gamelength_col, gameend_col, number_col, misthrow_col, rowcolumn_col, noised_col, reject_col);
+		System.out.println(gamelength_col.printAllStats()+"\n"+gameend_col.printAllStats()+"\n"+score_col.printAllStats()+"\n"+misthrow_col.printAllStats()+"\n"+rowcolumn_col.printAllStats()+"\n"+number_col.printAllStats()+"\n"+reject_col.printAllStats());
 	}
-
-	public static void QwinPlayerLA_1v1_Backprop_MT() {
+	public static void QwinPlayerLA_1v1_Backprop_new() {
 		double regularisation = 0;
-		int numTrainingMatches_per_thread = 100;
-		int numOfMinLearningSteps = 10;
+		int numTrainingMatches = 3000;
+		int numOfMinLearningSteps = 5;
 		// int highestAcceptedLoss = 80;
-		double VERSION = 8.0;
+		double VERSION = 10.0;
 		Random generator = new Random();
 		long seed = generator.nextLong();
 		System.out.println(seed);
 		Random init = new Random(seed);
-		QwinPlayerLA_NNEval initPlayer = new QwinPlayerLA_NNEval(init, "LANNEVAL8_weights.txt");// new
-																								// QwinPlayerLA_NNEval(new
-																								// Random(init.nextLong()));//
-																								// new
-																								// QwinPlayerLA_NNEval(init,"LANNEVAL7_weights.txt",false);
-																								//
-
-		Learner learner = new VProp85avg();// new MomentumDescent(0.01, 0.9);
-
-		ArrayList<Pair<double[], Double>> fullPaperScoreHistory = new ArrayList<Pair<double[], Double>>();
+		QwinPlayerLA_NNEval initPlayer = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");//new QwinPlayerLA_NNEval(init);
+		double step_size = 6.54292655155398E-4;
 
 		// STEP START
-		int step = 830;
+		int step = 345;
 		if (step == 0) {
 			try {
 				File statFile = new File("LANN" + VERSION + "_train_statistic.txt");
 				FileWriter sWriter = new FileWriter(statFile, true);
 				BufferedWriter bw = new BufferedWriter(sWriter);
 				bw.write(
-						"step\tscore\tgame length\tmisthrows\tfull lanes\tfull pentagon columns\tentered numbers\ttrue reject rate\tnoised decision rate");
+						"step\tscore\tgame length\tmisthrows\tfull lanes\tfull pentagon columns\tentered numbers\ttrue reject rate\tnoised decision rate\tgames ended w. full lanes");
 				bw.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -164,71 +156,32 @@ public class QwintoSimulation {
 			FeedForwardNetwork evalNetwork = initPlayer.getEvalNetwork();
 			double[] weights_biases_copy = evalNetwork.copyWeightBiasVector();
 			// we have 2 players with the same network but each with a bit of noise added
-			// we let them play matches and record
-			double averageScore = 0;
-			double averageGameLength = 0;
-			double averageMisthrows = 0;
-			double averageFullLanes = 0;
-			double averageEnteredNumbers = 0;
-			double avgProportionReject = 0;
-			double avgFullPentagonCols = 0;
-			double avgPropNoisedActions = 0;
-			// -1 to have one free process
-			int numThreads = Runtime.getRuntime().availableProcessors() - 4;
-			// for 1 process we fix the number of threads to 1
-			if (numThreads < 1)
-				numThreads = 1;
-			ThreadGroup tg_matches = new ThreadGroup("LANN-Matches");
-			MatchMultiThreaderLANN[] threads = new MatchMultiThreaderLANN[numThreads];
-			// start the threads
-			for (int th_i = 0; th_i < numThreads; th_i++) {
-				threads[th_i] = new MatchMultiThreaderLANN("LANN machtes " + th_i, tg_matches,
-						numTrainingMatches_per_thread, new Random(init.nextLong()), weights_biases_copy,
-						(step == 0 ? 10. : (10. / Math.pow(step, .5))), 5);
-				threads[th_i].start();
-			}
-
-			// avg. p. noised actions/p: 0.0077001116900273945 with 20/pow(1)
-			// avg. p. noised actions/p: 0.03820185379679242 with 20/pow(0.75)
-
-			// wait for all the threads to finish their matches
-			for (int th_i = 0; th_i < numThreads; th_i++) {
-				try {
-					threads[th_i].join();
-					fullPaperScoreHistory.addAll(threads[th_i].getDataHistory());
-					averageScore += threads[th_i].getAvgScore();
-					averageGameLength += threads[th_i].getAvgGameLength();
-					averageMisthrows += threads[th_i].getAvgMisthrowsAtEnd();
-					averageFullLanes += threads[th_i].getNumFullLanesAtEnd();
-					averageEnteredNumbers += threads[th_i].getNumNumbersAtEnd();
-					avgProportionReject += threads[th_i].getAvgPropReject();
-					avgFullPentagonCols += threads[th_i].getAvgFullPentagonCols();
-					avgPropNoisedActions += threads[th_i].getAvgPropNoisedActions();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			// the threads are done
-			// we calculate the average score for these threads
-			averageScore /= numThreads;
-			averageGameLength /= numThreads;
-			averageMisthrows /= numThreads;
-			averageFullLanes /= numThreads;
-			averageEnteredNumbers /= numThreads;
-			avgProportionReject /= numThreads;
-			avgFullPentagonCols /= numThreads;
-			avgPropNoisedActions /= numThreads;
-			System.out.println("step " + step + "\navg. score:\t\t\t" + averageScore);
-			System.out.println("avg. game length:\t\t" + averageGameLength);
-			System.out.println("avg. misthrows/player:\t\t" + averageMisthrows);
-			System.out.println("avg. full-lanes/player:\t\t" + averageFullLanes);
-			System.out.println("avg. entered-nums/player:\t" + averageEnteredNumbers);
-			System.out.println("avg. p. true rej./player:\t" + avgProportionReject);
-			System.out.println("avg. f. pentagons/player:\t" + avgFullPentagonCols);
-			System.out.println("number of training data:\t" + fullPaperScoreHistory.size());
-			System.out.println("avg. p. noised actions/p:\t" + avgPropNoisedActions);
+			RawData raw_data = multithread_matches(numTrainingMatches, new LANN_Gen(new Random(init.nextLong()), (2/Math.pow(1+step, 0.15)), weights_biases_copy, 5));
+			
+			Score_Collector score_col = new Score_Collector();
+			GameLength_Collector gamelength_col = new GameLength_Collector();
+			GameEnd_Collector gameend_col = new GameEnd_Collector();
+			Misthrow_Collector misthrow_col = new Misthrow_Collector();
+			FullRowsColumns_Collector rowcolumn_col = new FullRowsColumns_Collector();
+			EnteredNumbers_Collector numbers_col = new EnteredNumbers_Collector();
+			NoisedDecision_Collector noised_col = new NoisedDecision_Collector();
+			Reject_Collector reject_col = new Reject_Collector();
+			TDLANN10_Collector train_data_col = new TDLANN10_Collector();
+			RawDataAnalyzer.extractDataFromSimulations(raw_data, numbers_col, score_col, gamelength_col, gameend_col, misthrow_col, rowcolumn_col, noised_col, reject_col, train_data_col);
+			
+			System.out.println("step " + step + "\navg. score:\t\t\t" + score_col.getAverageScore());
+			System.out.println("avg. game length:\t\t" + gamelength_col.getAvgGamelength());
+			System.out.println("games ended w. full lanes\t" + gameend_col.getProportionGameEnd_2fulllanes());
+			System.out.println("avg. misthrows/player:\t\t" + misthrow_col.getAvgerageMisthrows());
+			System.out.println("avg. full-lanes/player:\t\t" + rowcolumn_col.getAvgFullLanes());
+			System.out.println("avg. f. pentagons/player:\t" + rowcolumn_col.getAvgFullPentaColumns());
+			System.out.println("avg. entered-nums/player:\t" + numbers_col.getAvgEnteredNumbers());
+			System.out.println("avg. p. true rej./player:\t" + reject_col.getTrueRejectRate());
+			System.out.println("avg. p. noised actions/p:\t" + noised_col.getProportionNoisedDecision());
+			System.out.println("number of training data:\t" + train_data_col.getTrainingData().size());
+			
 			try {
-				File paramFile = new File("" + step + "_" + averageScore + "_LANN" + VERSION + ".txt");
+				File paramFile = new File("" + step + "_" + score_col.getAverageScore() + "_LANN" + VERSION + ".txt");
 				FileWriter pWriter = new FileWriter(paramFile);
 				double[] weightsBiasVector = evalNetwork.copyWeightBiasVector();
 				for (int i = 0; i < weightsBiasVector.length; i++) {
@@ -239,15 +192,16 @@ public class QwintoSimulation {
 				File statFile = new File("LANN" + VERSION + "_train_statistic.txt");
 				FileWriter sWriter = new FileWriter(statFile, true);
 				BufferedWriter bw = new BufferedWriter(sWriter);
-				bw.write("\n" + step + "\t" + averageScore + "\t" + averageGameLength + "\t" + averageMisthrows + "\t"
-						+ averageFullLanes + "\t" + avgFullPentagonCols + "\t" + averageEnteredNumbers + "\t"
-						+ avgProportionReject + "\t" + avgPropNoisedActions);
+				bw.write("\n" + step + "\t" + score_col.getAverageScore() + "\t" + gamelength_col.getAvgGamelength() + "\t" + misthrow_col.getAvgerageMisthrows() + "\t"
+						+ rowcolumn_col.getAvgFullLanes() + "\t" + rowcolumn_col.getAvgFullPentaColumns() + "\t" +  numbers_col.getAvgEnteredNumbers() + "\t"
+						+ reject_col.getTrueRejectRate() + "\t" + noised_col.getProportionNoisedDecision() + "\t" + gameend_col.getProportionGameEnd_2fulllanes());
 				bw.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			int numData = fullPaperScoreHistory.size();
+			int numThreads = 12;
+				
+			int numData = train_data_col.getTrainingData().size();
 			// System.out.println("full data length\t"+numData);
 			// calculate splitting parameters
 			int split_base = numData / numThreads;
@@ -267,7 +221,7 @@ public class QwintoSimulation {
 				// decrease the split rest counter, because we distributed one of the rest
 				split_rest--;
 				for (int split_i = 0; split_i < splittedData.length; split_i++) {
-					Pair<double[], Double> data_point = fullPaperScoreHistory.get(data_copy_pos);
+					Pair<double[], Double> data_point =  train_data_col.getTrainingData().get(data_copy_pos);
 					// increase the data copy position because we just copy the previous data point
 					data_copy_pos++;
 					splittedData[split_i][0] = data_point.getX();
@@ -278,6 +232,9 @@ public class QwintoSimulation {
 			}
 			// LEARNING
 			int lstep = 0;
+			double previousLoss = 0;
+			Learner learner = new GradientDescent(step_size);
+			System.out.println("lstep size:\t"+step_size);
 			// double currentLoss = Double.MAX_VALUE;
 			while (lstep < numOfMinLearningSteps) {
 				// initiate
@@ -302,6 +259,9 @@ public class QwintoSimulation {
 				}
 				// the threads have calculated the gradient
 				loss /= numThreads;
+				if (lstep > 0 && loss > previousLoss) step_size *= 0.8;
+				previousLoss = loss;
+				
 //				currentLoss = loss;
 				System.out.println((lstep + 1) + ".loss\t" + loss);
 				// calculate the average of the gradient
@@ -312,12 +272,11 @@ public class QwintoSimulation {
 				evalNetwork.applyWeightsBiasGradient(learner.adaptGradientVector(gradient), regularisation);
 				lstep++;
 			}
+			step_size *= 0.99;
 			// clear the data because we get new and hopefully better decision making and
 			// therefore all the scores recorded are invalid
-			fullPaperScoreHistory.clear();
 			step++;
 		}
 
 	}
-
 }

@@ -58,8 +58,27 @@ public class Score_Collector implements MatchStatCollecting{
 
 	@Override
 	public void processPreTurn(TurnData turn, PlayerData[] players, QwinPaper[] papers) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public String printAllStats() {
+		String str = "Score - collector\naverage score of all players:\t"+average_score+"\naverage score of individual players:\n";
+		for (int i = 0; i < avg_score_player.length; i++) {
+			str = str+"player "+i+":\t"+avg_score_player[i]+"\n";
+		}
+		str = str+"score distribution\nscore";
+		for (int i = 0; i < score_distribution_player.length; i++) {
+			str = str+"\tplayer "+i;
+		}
+		str = str+"\n";
+		for (int j = 0; j < score_distribution_player[0].length; j++) {
+			str = str+(j-20);
+			for (int i = 0; i < score_distribution_player.length; i++) {
+				str = str+"\t"+score_distribution_player[i][j];
+			}
+			str = str+"\n";
+		}
+		return str;
 	}
 
 }

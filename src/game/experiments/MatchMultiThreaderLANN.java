@@ -115,7 +115,6 @@ public class MatchMultiThreaderLANN extends Thread {
 				playeravgEnteredNumbers += players[k].getPaper().getNumberOfEnteredNumbers();
 				playeravgReject += players[k].getProportionOfRejects();
 				playeravgFullPentagonColumns += players[k].getPaper().getNumberOfFullPentagonColumns();
-				playeravgPropNoisedActions += players[k].getNoisedActionProportion();
 			}
 			avgScore += playeravgScore / players.length;
 			avgGameLength += match.getNumberOfTurns();

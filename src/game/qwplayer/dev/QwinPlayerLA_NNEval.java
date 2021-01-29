@@ -75,23 +75,13 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 	@Override
 	public void matchEndWrapUp(QwinPaper[] allPapers) {
 		super.matchEndWrapUp(allPapers);
-		/*int min = Integer.MAX_VALUE;
-		int max = Integer.MIN_VALUE;
-		for (int i = 0; i < allPapers.length; i++) {
-			int score = allPapers[i].calculateScore();
-			if (score > max) {
-				max = score;
-			} 
-			if (score < min) {
-				min = score;
-			}
-		}
-		double predictValue = 0;
-		if (max == min) {
-			predictValue = 0.5;
-		} else {
-			predictValue = (paper.calculateScore()-min)/(double)(max-min);
-		}*/
+		/*
+		 * int min = Integer.MAX_VALUE; int max = Integer.MIN_VALUE; for (int i = 0; i <
+		 * allPapers.length; i++) { int score = allPapers[i].calculateScore(); if (score
+		 * > max) { max = score; } if (score < min) { min = score; } } double
+		 * predictValue = 0; if (max == min) { predictValue = 0.5; } else { predictValue
+		 * = (paper.calculateScore()-min)/(double)(max-min); }
+		 */
 		fillHistoryScoreData((double) this.paper.calculateScore());
 	}
 
@@ -105,9 +95,9 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 	public ArrayList<Pair<double[], Double>> getPaperScoreHistory() {
 		return paperScoreHistory;
 	}
-	
+
 	// 8
-	private void initNet() {
+	private void initNet8() {
 		scoreEvalNetwork = new FeedForwardNetwork();
 		scoreEvalNetwork.addBlock(515, 100, true, Activation.TANH);
 		scoreEvalNetwork.addBlock(100, 50, true, Activation.TANH);
@@ -115,39 +105,24 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 		scoreEvalNetwork.addBlock(20, 1, true, Activation.NONE);
 		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
 	}
-	
+
 	// 9 init
 	private void initNet9() {
 		scoreEvalNetwork = new FeedForwardNetwork();
-		scoreEvalNetwork.addBlock(83, 100, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(100, 100, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(100, 100, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(100, 1, true, Activation.NONE);
-		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
+		scoreEvalNetwork.addBlock(83, 80, true, Activation.TANH);
+		scoreEvalNetwork.addBlock(80, 1, true, Activation.NONE);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 0.01);
 	}
-	
-	// 9 fill
-	private void fillInputVector9(QwinPaper paper, double[] input) {
-		int[] redline = paper.getRedLine();
-		int[] yellowline = paper.getYellowLine();
-		int[] purpleline = paper.getPurpleLine();
-		boolean[][] blocked = paper.generateBlockedFields();
-		for (int i = 0; i < 9; i++) {
-			input[i] = redline[i]/18.;
-			input[i+9] = yellowline[i]/18.;
-			input[i+18] = purpleline[i]/18.;
-			input[i+27] = (redline[i]>0?1.:0.);
-			input[i+36] = (yellowline[i]>0?1.:0.);
-			input[i+45] = (purpleline[i]>0?1.:0.);
-			input[i+54] = ((blocked[0][i]&&redline[i]==0)?1.:0.);
-			input[i+63] = ((blocked[1][i]&&yellowline[i]==0)?1.:0.);
-			input[i+72] = ((blocked[2][i]&&purpleline[i]==0)?1.:0.);
-		}
-		input[81] = paper.getNumberOfMisthrows() * 1. / 4.;
-		input[82] = numOfTurns / (15. + Math.abs(numOfTurns));
+
+	// 10 init
+	private void initNet() {
+		scoreEvalNetwork = new FeedForwardNetwork();
+		scoreEvalNetwork.addBlock(488, 30, true, Activation.TANH);
+		scoreEvalNetwork.addBlock(30, 1, true, Activation.NONE);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 0.01);
 	}
-	
-	// 8
+
+	// 10 fill
 	private void fillInputVector(QwinPaper paper, double[] input) {
 		int[] redline = paper.getRedLine();
 		int[] yellowline = paper.getYellowLine();
@@ -155,52 +130,67 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 		for (int i = 0; i < 9; i++) {
 			if (redline[i] != 0) {
 				input[i * 18 + redline[i] - 1] = 1;
-				input[488+i] = 1;
-			}	
+			}
 			if (yellowline[i] != 0) {
 				input[18 * (9 + i) + yellowline[i] - 1] = 1;
-				input[497+i] = 1;
 			}
 			if (purpleline[i] != 0) {
 				input[18 * (18 + i) + purpleline[i] - 1] = 1;
-				input[506+i] = 1;
 			}
 		}
 		input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
 		input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
 	}
-	
-	// fill input vector for 
+
+	// 9 fill
+	private void fillInputVector9(QwinPaper paper, double[] input) {
+		int[] redline = paper.getRedLine();
+		int[] yellowline = paper.getYellowLine();
+		int[] purpleline = paper.getPurpleLine();
+		boolean[][] blocked = paper.generateBlockedFields();
+		for (int i = 0; i < 9; i++) {
+			input[i] = redline[i] / 18.;
+			input[i + 9] = yellowline[i] / 18.;
+			input[i + 18] = purpleline[i] / 18.;
+			input[i + 27] = (redline[i] > 0 ? 1. : 0.);
+			input[i + 36] = (yellowline[i] > 0 ? 1. : 0.);
+			input[i + 45] = (purpleline[i] > 0 ? 1. : 0.);
+			input[i + 54] = ((blocked[0][i] && redline[i] == 0) ? 1. : 0.);
+			input[i + 63] = ((blocked[1][i] && yellowline[i] == 0) ? 1. : 0.);
+			input[i + 72] = ((blocked[2][i] && purpleline[i] == 0) ? 1. : 0.);
+		}
+		input[81] = paper.getNumberOfMisthrows() * 1. / 4.;
+		input[82] = numOfTurns / (15. + Math.abs(numOfTurns));
+	}
+
+	// 8
+	private void fillInputVector8(QwinPaper paper, double[] input) {
+		int[] redline = paper.getRedLine();
+		int[] yellowline = paper.getYellowLine();
+		int[] purpleline = paper.getPurpleLine();
+		for (int i = 0; i < 9; i++) {
+			if (redline[i] != 0) {
+				input[i * 18 + redline[i] - 1] = 1;
+				input[488 + i] = 1;
+			}
+			if (yellowline[i] != 0) {
+				input[18 * (9 + i) + yellowline[i] - 1] = 1;
+				input[497 + i] = 1;
+			}
+			if (purpleline[i] != 0) {
+				input[18 * (18 + i) + purpleline[i] - 1] = 1;
+				input[506 + i] = 1;
+			}
+		}
+		input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
+		input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
+	}
+
+	// fill input vector for
 	/**
-	 * 0	r1
-	 * 1	r2
-	 * 2	r3
-	 * 3	r4
-	 * 4	r5
-	 * 5	r6
-	 * 6	r7
-	 * 7	r8
-	 * 8	r9
-	 * 9	y1
-	 * 10	y2
-	 * 11	y3
-	 * 12	y4
-	 * 13	y5
-	 * 14	y6
-	 * 15	y7
-	 * 16	y8
-	 * 17	y9
-	 * 18	p1
-	 * 19	p2
-	 * 20	p3
-	 * 21	p4
-	 * 22	p5
-	 * 23	p6
-	 * 24	p7
-	 * 25	p8
-	 * 26	p9
-	 * 27	mis
-	 * 28	rou
+	 * 0 r1 1 r2 2 r3 3 r4 4 r5 5 r6 6 r7 7 r8 8 r9 9 y1 10 y2 11 y3 12 y4 13 y5 14
+	 * y6 15 y7 16 y8 17 y9 18 p1 19 p2 20 p3 21 p4 22 p5 23 p6 24 p7 25 p8 26 p9 27
+	 * mis 28 rou
 	 * 
 	 * 
 	 * @param paper
@@ -216,8 +206,8 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 
 	@Override
 	public double evaluatePaper(QwinPaper paper) {
-		//if (paper.isEndCondition())
-		//	return paper.calculateScore();
+		// if (paper.isEndCondition())
+		// return paper.calculateScore();
 		double[] input = new double[scoreEvalNetwork.getInputLength()];
 		fillInputVector(paper, input);
 		scoreEvalNetwork.prozessInput(input);
@@ -227,7 +217,7 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 
 	@Override
 	public String getName() {
-		return "LANNEVAL("+UtilMethods.roundTo(noiselevel, 2)+")";
+		return "LANNEVAL(" + UtilMethods.roundTo(noiselevel, 2) + ")";
 	}
 
 }

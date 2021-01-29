@@ -8,9 +8,17 @@ import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
 
 public class Reject_Collector implements MatchStatCollecting {
-	public double[] trueRejectRate_player;
-	public int[] rejectableDecisions_player;
-	public double trueRejectRate;
+	private double[] trueRejectRate_player;
+	private int[] rejectableDecisions_player;
+	private double trueRejectRate;
+	
+	public double getTrueRejectRate() {
+		return trueRejectRate;
+	}
+	
+	public double[] getTrueRejectRate_player() {
+		return trueRejectRate_player;
+	}
 	
 	@Override
 	public void preMatchSetup(MatchData match) {
@@ -54,6 +62,15 @@ public class Reject_Collector implements MatchStatCollecting {
 				}
 			}
 		}
+	}
+
+	@Override
+	public String printAllStats() {
+		String str = "Reject rate - collector\naverage reject rate of all players:\t"+trueRejectRate+"\naverage reject rate of individual players\n";
+		for (int i = 0; i < trueRejectRate_player.length; i++) {
+			str = str+"player "+i+":\t"+trueRejectRate_player[i]+"\n";
+		}
+		return str;
 	}
 
 }
