@@ -36,13 +36,17 @@ public class QwinPaperGUI {
 		paperCanvas.setSize(600,364);
 		f.setVisible(true);
 		paperCanvas.setVisible(true);
-		
+		f.setAlwaysOnTop(true);
 	}
 
 	public void update(QwinPaper paper) {
 		paperCanvas.updatePaper(paper);
 		f.repaint();
 		paperCanvas.repaint();
+	}
+	
+	public void game_has_ended() {
+		paperCanvas.gameEnded();
 	}
 	
 	public static void main(String[] args) {

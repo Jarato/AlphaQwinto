@@ -27,21 +27,13 @@ public class QwintoHumanMatch {
 	private int turn;
 	private boolean matchEnd;
 	private QwinPaperGUI gui;
+	private QwinAudioSystem audiosystem;
+	private Random rnd;
 	private Pattern intPattern = Pattern.compile("^[0-9]+$");
 	private Pattern playerPattern = Pattern.compile("^ai|h|end$");
 	private Pattern diceColorPattern = Pattern.compile("^[ryp]|ry|rp|yp|yr|pr|py|ryp|yrp|rpy|ypr|pry|pyr$");
 
 	public static void main(String[] args) {
-		try {
-			File f = new File("./audio/intro.wav");
-		    AudioInputStream audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());  
-		    Clip clip = AudioSystem.getClip();
-		    clip.open(audioIn);
-		    clip.start();
-		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		Random rnd = new Random();
 		QwintoHumanMatch match = new QwintoHumanMatch(new QwinPlayerLA_NNEval(rnd, 10, "LANNEVAL10_weights.txt"));
 		match.calculateMatch();
@@ -52,12 +44,15 @@ public class QwintoHumanMatch {
 	}
 
 	public QwintoHumanMatch(Random rnd, QwinPlayer_t initAIPlayer) {
+		audiosystem = new QwinAudioSystem();
 		ai_player = initAIPlayer;
 		matchEnd = false;
 		gui = new QwinPaperGUI();
+		this.rnd = rnd;
 	}
 
 	public void calculateMatch() {
+		audiosystem.playAudio_Gamestart();
 		turn = 1;
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		try {
@@ -72,6 +67,8 @@ public class QwintoHumanMatch {
 				}
 				if (input.equals("h")) {
 					// human
+					int rndwhere = rnd.nextInt(3);
+					if (rndwhere == 0) audiosystem.playAudio_Random();
 					System.out.println("Put in the chosen colors (\"y\" for yellow, \"r\" for red and \"p\" for purple): ");
 					String color_str = reader.readLine();
 					while (!diceColorPattern.matcher(color_str).matches()) {
@@ -79,6 +76,7 @@ public class QwintoHumanMatch {
 						color_str = reader.readLine();
 					}
 					DiceRoll dc = new DiceRoll();
+					if (rndwhere == 1) audiosystem.playAudio_Random();
 					// transform color_str into a DiceRoll object
 					for (int i = 0; i < color_str.length(); i++){
 					    char c = color_str.charAt(i);
@@ -93,6 +91,7 @@ public class QwintoHumanMatch {
 						System.out.println(rolled_number_str + " is not a rollable number with these dice! Try again: ");
 						rolled_number_str = reader.readLine();
 					}
+					if (rndwhere == 2) audiosystem.playAudio_Random();
 					int rolled_number = Integer.parseInt(rolled_number_str);
 					int action = ai_player.getActionFlag(rolled_number, dc, false, true);
 					if (action == 1) {
@@ -109,6 +108,7 @@ public class QwintoHumanMatch {
 				}
 				if (input.equals("ai")) {
 					DiceRoll dc = ai_player.getDiceRoll();
+					audiosystem.playAudio_DiceRollChoice(dc);
 					System.out.println("\nAlphaQwinto wants to roll " + dc);
 					System.out.println("Put in the rolled number: ");
 					String rolled_number_str = reader.readLine();
@@ -120,6 +120,7 @@ public class QwintoHumanMatch {
 					int action = ai_player.getActionFlag(rolled_number, dc, true, false);
 					if (action == 0) {
 						// ai wants to reroll
+						audiosystem.playAudio_Reroll();
 						System.out.println("AlphaQwinto wants to reroll that number! Enter the new number: ");
 						rolled_number_str = reader.readLine();
 						while (!intPattern.matcher(rolled_number_str).matches() || !dc.canRollNumber(Integer.parseInt(rolled_number_str))) {
@@ -132,6 +133,7 @@ public class QwintoHumanMatch {
 					action = ai_player.getActionFlag(rolled_number, dc, false, false);
 					if (action == 2) {
 						// misthrow!
+						audiosystem.playAudio_Misthrow(ai_player.getPaper().getNumberOfMisthrows()+1);
 						System.out.println("AlphaQwinto does not enter this number, it's a misthrow!");
 					} else {
 						RawDataAnalyzer.ColorPosition cp = RawDataAnalyzer.actionflag_to_colorposition(action);
@@ -144,13 +146,14 @@ public class QwintoHumanMatch {
 				}
 				if (input.equals("end")) {
 					matchEnd = true;
+					gui.game_has_ended();
 				}
 				ai_player.turnEndWrapUp();
 				gui.update(ai_player.getPaper());
 				turn++;
 			}
+			audiosystem.playAudio_Gameend(ai_player.getPaper());
 			System.out.println("score of AlphaQwinto's paper: "+ai_player.getPaper().calculateScore());
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -10,9 +10,14 @@ import game.QwinPaper;
 public class QwintoPaperCanvas extends Canvas {
 	private BufferedImage background;
 	private QwinPaper paper;
+	private boolean gameend;
 	
 	public QwintoPaperCanvas(BufferedImage background_image) {
 		background = background_image;
+	}
+	
+	public void gameEnded() {
+		gameend = true;
 	}
 	
 	@Override
@@ -31,7 +36,7 @@ public class QwintoPaperCanvas extends Canvas {
 			for (int i = 0; i < paper.getNumberOfMisthrows(); i++) {
 				g.drawString("X", 223+i*44, 252);
 			}
-			if (paper.isEndCondition()) {
+			if (paper.isEndCondition() || gameend) {
 				// match over, display the score calculation aswell as the score
 				for (int i = 0; i < 3; i++) {
 					int lscore = paper.getLineScore(i);
