@@ -26,6 +26,7 @@ import game.experiments.multistat.analyze.collect.NoisedDecision_Collector;
 import game.experiments.multistat.analyze.collect.Reject_Collector;
 import game.experiments.multistat.analyze.collect.Score_Collector;
 import game.experiments.multistat.analyze.collect.TDLANN10_Collector;
+import game.experiments.multistat.analyze.collect.TDLANN11_Collector;
 import game.experiments.multistat.analyze.collect.TDLANN9_Collector;
 import game.experiments.multistat.data.RawData;
 import game.experiments.multistat.matchgen.LANN_Gen;
@@ -58,18 +59,15 @@ import pdf.util.UtilMethods;
 
 public class QwintoSimulation {
 	public static void main(String[] args) {
-		//simpleMatch();
-		test_multimatches();
-		//QwinPlayerLA_1v1_Backprop_new();
-		// QwinPlayerLA_1v1_Backprop_MT();
-		//QwinPlayerLA_1v1_Backprop_new();
+		//test_multimatches();
+		QwinPlayerLA_1v1_Backprop_new();
 	}
 
 	public static void simpleMatch() {
-		Random init = new Random();
+		Random init = new Random(42);
 		RawData raw_data = new RawData();
-		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");
-		Match_Generator gen = new LANN_Gen(init, 0., init_player.getEvalNetwork().copyWeightBiasVector(), 5);
+		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init,10, "LANNEVAL10_weights.txt");
+		Match_Generator gen = new Test_Gen(init);//LANN_Gen(init, 0., init_player.getEvalNetwork().copyWeightBiasVector(), 5);
 		//QwintoMatch match = new QwintoMatch(new Random(init.nextLong()), qPlayers);
 		//match.setRawData(raw_data.generateBlankMatchData());
 		//match.calculateMatch();
@@ -107,10 +105,10 @@ public class QwintoSimulation {
 	}
 	
 	public static void test_multimatches() {
-		Random init = new Random();
-		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");
+		Random init = new Random(42);
+		QwinPlayerLA_NNEval init_player = new QwinPlayerLA_NNEval(init,10, "LANNEVAL10_weights.txt");
 		Match_Generator gen = new Test_Gen(init);//new LANN_Gen(init, 0., init_player.getEvalNetwork().copyWeightBiasVector(), 5);
-		RawData raw_data = multithread_matches(30000, gen);
+		RawData raw_data = multithread_matches(1, gen);
 		System.out.println("number of games recorded: "+raw_data.matches.size());
 		Score_Collector score_col = new Score_Collector();
 		GameLength_Collector gamelength_col = new GameLength_Collector();
@@ -125,20 +123,20 @@ public class QwintoSimulation {
 		System.out.println(gamelength_col.printAllStats()+"\n"+gameend_col.printAllStats()+"\n"+score_col.printAllStats()+"\n"+misthrow_col.printAllStats()+"\n"+rowcolumn_col.printAllStats()+"\n"+number_col.printAllStats()+"\n"+reject_col.printAllStats());
 	}
 	public static void QwinPlayerLA_1v1_Backprop_new() {
-		double regularisation = 0;
+		double regularisation = 0.0;
 		int numTrainingMatches = 3000;
 		int numOfMinLearningSteps = 5;
 		// int highestAcceptedLoss = 80;
-		double VERSION = 10.0;
+		double VERSION = 11.0;
 		Random generator = new Random();
 		long seed = generator.nextLong();
 		System.out.println(seed);
 		Random init = new Random(seed);
-		QwinPlayerLA_NNEval initPlayer = new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");//new QwinPlayerLA_NNEval(init);
-		double step_size = 6.54292655155398E-4;
+		QwinPlayerLA_NNEval initPlayer = new QwinPlayerLA_NNEval(init, 10);//new QwinPlayerLA_NNEval(init, "LANNEVAL10_weights.txt");
+		double step_size = 0.1;
 
 		// STEP START
-		int step = 345;
+		int step = 0;
 		if (step == 0) {
 			try {
 				File statFile = new File("LANN" + VERSION + "_train_statistic.txt");
@@ -156,7 +154,7 @@ public class QwintoSimulation {
 			FeedForwardNetwork evalNetwork = initPlayer.getEvalNetwork();
 			double[] weights_biases_copy = evalNetwork.copyWeightBiasVector();
 			// we have 2 players with the same network but each with a bit of noise added
-			RawData raw_data = multithread_matches(numTrainingMatches, new LANN_Gen(new Random(init.nextLong()), (2/Math.pow(1+step, 0.15)), weights_biases_copy, 5));
+			RawData raw_data = multithread_matches(numTrainingMatches, new LANN_Gen(new Random(init.nextLong()), 1.0/*(0.01/Math.pow(1+step, 0.2))*/, weights_biases_copy, 2));
 			
 			Score_Collector score_col = new Score_Collector();
 			GameLength_Collector gamelength_col = new GameLength_Collector();

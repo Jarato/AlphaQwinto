@@ -23,14 +23,16 @@ public class MatchMultiThreaderLANN extends Thread {
 	private double[] wbBase;
 	private int numPlayers;
 	private double noise_lvl;
+	private int ai_version;
 	
-	public MatchMultiThreaderLANN(String name, ThreadGroup tg, int numberOfMatches, Random rnd, double[] weightsBiasBase, double noise_level, int numOfPlayers) {
+	public MatchMultiThreaderLANN(String name, ThreadGroup tg, int numberOfMatches, Random rnd, int version, double[] weightsBiasBase, double noise_level, int numOfPlayers) {
 		super(tg,name);
 		numMatches = numberOfMatches;
 		this.rnd = rnd;
 		wbBase = weightsBiasBase;
 		numPlayers = numOfPlayers;
 		noise_lvl = noise_level;
+		ai_version = version;
 	}
 	
 	public double getAvgScore() {
@@ -94,7 +96,7 @@ public class MatchMultiThreaderLANN extends Thread {
 			QwinPlayerLA_NNEval[] players = new QwinPlayerLA_NNEval[numPlayers];
 
 			for (int k = 0; k < players.length; k++) {
-				players[k] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()));
+				players[k] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()),ai_version);
 				players[k].getEvalNetwork().applyWeightsBiasesVector(wbBase);
 				players[k].setNoiseLevel(noise_lvl);
 			}

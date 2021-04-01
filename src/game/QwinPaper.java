@@ -301,6 +301,30 @@ public class QwinPaper {
 		return num;
 	}
 	
+	public int getLineScore(int color) {
+		int numNum = 0;
+		int[] line = (color == 0?lineRed:(color == 1)?lineYellow:linePurple);
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (line[i] > 0) numNum++;
+		}
+		return (numNum == 9?line[LINE_LENGTH-1]:numNum);
+	}
+	
+	public int getPentaColumnScore(int pentacolumn) {
+		switch(pentacolumn) {
+		case 0: if (lineRed[0] > 0 && lineYellow[1] > 0 && linePurple[2] > 0) return linePurple[2];
+			break;
+		case 1: if (lineRed[1] > 0 && lineYellow[2] > 0 && linePurple[3] > 0) return lineRed[1];
+			break;
+		case 2: if (lineRed[4] > 0 && lineYellow[5] > 0 && linePurple[6] > 0) return lineRed[4];
+			break;
+		case 3: if (lineRed[5] > 0 && lineYellow[6] > 0 && linePurple[7] > 0) return lineYellow[6];
+			break;
+		case 4: if (lineRed[6] > 0 && lineYellow[7] > 0 && linePurple[8] > 0) return linePurple[8];
+			break;
+		}
+		return 0;
+	}
 	
 	
 	private String ntS(int num) {

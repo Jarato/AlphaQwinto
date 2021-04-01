@@ -22,7 +22,7 @@ public class LANN_Gen extends Match_Generator{
 		QwinPlayer_t[] players = new QwinPlayerLA_NNEval[number_of_players];
 		for (int i = 0; i < players.length; i++) {
 			Random newInit = new Random(rnd.nextLong());
-			QwinPlayerLA_NNEval p = new QwinPlayerLA_NNEval(newInit);
+			QwinPlayerLA_NNEval p = new QwinPlayerLA_NNEval(newInit, 10);
 			p.getEvalNetwork().applyWeightsBiasesVector(weights);
 			p.setNoiseLevel(noise);
 			players[i] = p;

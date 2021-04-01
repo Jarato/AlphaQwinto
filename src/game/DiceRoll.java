@@ -74,4 +74,12 @@ public class DiceRoll{
 	public boolean isValid() {
 		return (red || yellow || purple);
 	}
+	
+	public boolean canRollNumber(int number) {
+		int numDice = getNumberOfDice();
+		if (numDice == 1 && (number < 1 || number > 6)) return false;
+		if (numDice == 2 && (number < 2 || number > 12)) return false;
+		if (numDice == 3 && (number < 3 || number > 18)) return false;
+		return true;
+	}
 }

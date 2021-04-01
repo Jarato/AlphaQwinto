@@ -99,11 +99,11 @@ public abstract class QwinPlayer_t {
 	protected abstract int[] getActionFlagList(int diceNumber, DiceRoll thrown);
 	
 	
-	public int getActionFlag(int diceNumber, DiceRoll roll, boolean reThrowable, boolean rejectable) {
+	public int getActionFlag(int diceNumber, DiceRoll roll, boolean rerollable, boolean rejectable) {
 		int[] actionFlagList = getActionFlagList(diceNumber, roll);
 		// go through the action flag list and check if the action is a legal move, return the first legal action
 		for (int i = 0; i < actionFlagList.length; i++) {
-			if (actionFlagList[i] == 0 && reThrowable) return 0;
+			if (actionFlagList[i] == 0 && rerollable) return 0;
 			if (actionFlagList[i] == 0 && rejectable) return 1;
 			if (actionFlagList[i] > 0) {
 				int color = (actionFlagList[i]-1)/9;

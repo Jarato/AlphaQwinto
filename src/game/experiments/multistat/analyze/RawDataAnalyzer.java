@@ -8,7 +8,7 @@ import game.experiments.multistat.data.MatchData;
 import game.experiments.multistat.data.TurnData;
 
 public class RawDataAnalyzer {
-	private static class ColorPosition {
+	public static class ColorPosition {
 		public int color;
 		public int position;
 	}

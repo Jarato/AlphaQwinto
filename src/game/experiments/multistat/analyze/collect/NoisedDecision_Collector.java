@@ -1,6 +1,5 @@
 package game.experiments.multistat.analyze.collect;
 
-import game.DiceRoll;
 import game.QwinPaper;
 import game.experiments.multistat.analyze.MatchStatCollecting;
 import game.experiments.multistat.data.MatchData;
