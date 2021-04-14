@@ -8,13 +8,15 @@ import game.qwplayer.dev.QwinPlayer_t;
 public class LANN_Gen extends Match_Generator{
 	private double noise;
 	private double[] weights;
+	private int version;
 	private int number_of_players;
 	
-	public LANN_Gen(Random init, double noise_level, double[] weights, int numPlayers) {
+	public LANN_Gen(Random init, double noise_level, double[] weights, int numPlayers, int version) {
 		super(init);
 		this.noise = noise_level;
 		this.weights = weights;
 		this.number_of_players = numPlayers;
+		this.version = version;
 	}
 
 	@Override
@@ -22,7 +24,7 @@ public class LANN_Gen extends Match_Generator{
 		QwinPlayer_t[] players = new QwinPlayerLA_NNEval[number_of_players];
 		for (int i = 0; i < players.length; i++) {
 			Random newInit = new Random(rnd.nextLong());
-			QwinPlayerLA_NNEval p = new QwinPlayerLA_NNEval(newInit, 10);
+			QwinPlayerLA_NNEval p = new QwinPlayerLA_NNEval(newInit, version);
 			p.getEvalNetwork().applyWeightsBiasesVector(weights);
 			p.setNoiseLevel(noise);
 			players[i] = p;

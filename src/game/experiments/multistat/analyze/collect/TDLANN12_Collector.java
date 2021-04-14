@@ -9,7 +9,7 @@ import game.experiments.multistat.data.PlayerData;
 import game.experiments.multistat.data.TurnData;
 import pdf.util.Pair;
 
-public class TDLANN11_Collector implements MatchStatCollecting{
+public class TDLANN12_Collector implements MatchStatCollecting{
 	private ArrayList<Pair<double[], Double>> training_data = new ArrayList<Pair<double[], Double>>();
 	private ArrayList<ArrayList<Pair<double[], Double>>> td_onegame = new ArrayList<ArrayList<Pair<double[], Double>>>();
 	
@@ -47,7 +47,7 @@ public class TDLANN11_Collector implements MatchStatCollecting{
 				}
 			}
 			input[486] = paper.getNumberOfMisthrows() / 4.;
-			input[487] = Math.tanh(numOfTurns / 25.);
+			input[487] = Math.tanh(numOfTurns / 20.);
 			td_onegame.get(j).add(new Pair<double[], Double>(input, -1.));
 		}
 	}

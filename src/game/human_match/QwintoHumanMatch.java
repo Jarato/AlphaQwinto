@@ -35,7 +35,7 @@ public class QwintoHumanMatch {
 
 	public static void main(String[] args) {
 		Random rnd = new Random();
-		QwintoHumanMatch match = new QwintoHumanMatch(new QwinPlayerLA_NNEval(rnd, 10, "LANNEVAL10_weights.txt"));
+		QwintoHumanMatch match = new QwintoHumanMatch(new QwinPlayerLA_NNEval(rnd, 13, "LANNEVAL13_weights205.txt"));
 		match.calculateMatch();
 	}
 

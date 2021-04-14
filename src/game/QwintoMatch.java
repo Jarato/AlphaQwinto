@@ -23,6 +23,7 @@ public class QwintoMatch {
 		dice = new QwinDice(rnd);
 		currentPlayerIndex = rnd.nextInt(player.length);
 		matchEnd = false;
+		turn = 1;
 	}
 
 	public void setRawData(MatchData match_data_s) {
@@ -31,7 +32,6 @@ public class QwintoMatch {
 	}
 
 	public void calculateMatch() {
-		turn = 1;
 		while (!matchEnd) {
 			TurnData turn_data = match_data.generateBlankTurnData();
 			turn_data.turn_number = turn;
@@ -68,6 +68,32 @@ public class QwintoMatch {
 				turn--;
 			}
 		}
+	}
+	
+	public void setPresetNumberAllPlayers(int color, int pos, int number) {
+		TurnData turn_data = match_data.generateBlankTurnData();
+		turn_data.turn_number = turn;
+		turn_data.turn_of_player_idx = currentPlayerIndex;
+		player[currentPlayerIndex].getDiceRoll();
+		turn_data.players_action = new int[player.length];
+		turn_data.rolledNumbers = new int[] { number };
+		DiceRoll dr = DiceRoll.flagToDiceThrow(0);
+		int i = 1;
+		while(i < 7 && !dr.canRollNumber(number)) {
+			dr = DiceRoll.flagToDiceThrow(i);
+			i++;
+		}
+		player[currentPlayerIndex].getActionFlag(number, dr, true, false);
+		player[currentPlayerIndex].turnEndWrapUp();
+		turn_data.diceroll_flag = dr.getDiceThrowFlag();
+		for (int j = 0; j < turn_data.players_action.length; j++) {
+			turn_data.players_action[j] = 3+9*color+pos;
+			player[j].getActionFlag(number, dice.getLastThrown(), false, true);
+			player[j].getPaper().enterNumber(color, pos, number);
+			player[j].turnEndWrapUp();
+		}
+		currentPlayerIndex = (currentPlayerIndex + 1) % player.length;
+		turn =+ 1;
 	}
 
 	public int getNumberOfTurns() {

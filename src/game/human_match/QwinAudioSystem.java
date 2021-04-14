@@ -15,6 +15,7 @@ import game.DiceRoll;
 import game.QwinPaper;
 
 public class QwinAudioSystem {
+	private static boolean SOUND = false;
 	private ArrayList<Clip> introAudio = new ArrayList<Clip>();
 	private ArrayList<Clip> outroAudio = new ArrayList<Clip>();
 	private ArrayList<Clip> dicerollAudio = new ArrayList<Clip>();
@@ -24,7 +25,7 @@ public class QwinAudioSystem {
 	private boolean[] alreadyPlayedRnd;
 	private int playedRandomClips;
 	private Random rnd;
-	
+
 	public QwinAudioSystem() {
 		rnd = new Random();
 		playedRandomClips = 0;
@@ -154,7 +155,7 @@ public class QwinAudioSystem {
 			audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());
 			clip = AudioSystem.getClip();
 			clip.open(audioIn);
-			randomAudio.add(clip);		
+			randomAudio.add(clip);
 		} catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -163,83 +164,94 @@ public class QwinAudioSystem {
 	}
 
 	public void playAudio_Gamestart() {
-		introAudio.get(0).setMicrosecondPosition(0);
-		introAudio.get(0).start();
+		if (SOUND) {
+			introAudio.get(0).setMicrosecondPosition(0);
+			introAudio.get(0).start();
+		}
 	}
 
 	public void playAudio_Gameend(QwinPaper paper) {
-		if (paper.isEndCondition()) {
-			if (paper.getNumberOfMisthrows() == 4) {
-				outroAudio.get(0).setMicrosecondPosition(0);
-				outroAudio.get(0).start();
+		if (SOUND) {
+			if (paper.isEndCondition()) {
+				if (paper.getNumberOfMisthrows() == 4) {
+					outroAudio.get(0).setMicrosecondPosition(0);
+					outroAudio.get(0).start();
+				} else {
+					outroAudio.get(1).setMicrosecondPosition(0);
+					outroAudio.get(1).start();
+				}
 			} else {
-				outroAudio.get(1).setMicrosecondPosition(0);
-				outroAudio.get(1).start();
+				outroAudio.get(2).setMicrosecondPosition(0);
+				outroAudio.get(2).start();
 			}
-		} else {
-			outroAudio.get(2).setMicrosecondPosition(0);
-			outroAudio.get(2).start();
 		}
-
 	}
 
 	public void playAudio_DiceRollChoice(DiceRoll diceroll) {
-		if (diceroll.red && !diceroll.yellow && !diceroll.purple) {
-			dicerollAudio.get(0).setMicrosecondPosition(0);
-			dicerollAudio.get(0).start();
-		}
-		if (!diceroll.red && diceroll.yellow && !diceroll.purple) {
-			dicerollAudio.get(1).setMicrosecondPosition(0);
-			dicerollAudio.get(1).start();
-		}
-		if (diceroll.red && diceroll.yellow && !diceroll.purple) {
-			dicerollAudio.get(2).setMicrosecondPosition(0);
-			dicerollAudio.get(2).start();
-		}
-		if (!diceroll.red && !diceroll.yellow && diceroll.purple) {
-			dicerollAudio.get(3).setMicrosecondPosition(0);
-			dicerollAudio.get(3).start();
-		}
-		if (diceroll.red && !diceroll.yellow && diceroll.purple) {
-			dicerollAudio.get(4).setMicrosecondPosition(0);
-			dicerollAudio.get(4).start();
-		}
-		if (!diceroll.red && diceroll.yellow && diceroll.purple) {
-			dicerollAudio.get(5).setMicrosecondPosition(0);
-			dicerollAudio.get(5).start();
-		}
-		if (diceroll.red && diceroll.yellow && diceroll.purple) {
-			dicerollAudio.get(6).setMicrosecondPosition(0);
-			dicerollAudio.get(6).start();
+		if (SOUND) {
+			if (diceroll.red && !diceroll.yellow && !diceroll.purple) {
+				dicerollAudio.get(0).setMicrosecondPosition(0);
+				dicerollAudio.get(0).start();
+			}
+			if (!diceroll.red && diceroll.yellow && !diceroll.purple) {
+				dicerollAudio.get(1).setMicrosecondPosition(0);
+				dicerollAudio.get(1).start();
+			}
+			if (diceroll.red && diceroll.yellow && !diceroll.purple) {
+				dicerollAudio.get(2).setMicrosecondPosition(0);
+				dicerollAudio.get(2).start();
+			}
+			if (!diceroll.red && !diceroll.yellow && diceroll.purple) {
+				dicerollAudio.get(3).setMicrosecondPosition(0);
+				dicerollAudio.get(3).start();
+			}
+			if (diceroll.red && !diceroll.yellow && diceroll.purple) {
+				dicerollAudio.get(4).setMicrosecondPosition(0);
+				dicerollAudio.get(4).start();
+			}
+			if (!diceroll.red && diceroll.yellow && diceroll.purple) {
+				dicerollAudio.get(5).setMicrosecondPosition(0);
+				dicerollAudio.get(5).start();
+			}
+			if (diceroll.red && diceroll.yellow && diceroll.purple) {
+				dicerollAudio.get(6).setMicrosecondPosition(0);
+				dicerollAudio.get(6).start();
+			}
 		}
 	}
 
 	public void playAudio_Reroll() {
-		rerollAudio.get(0).setMicrosecondPosition(0);
-		rerollAudio.get(0).start();
+		if (SOUND) {
+			rerollAudio.get(0).setMicrosecondPosition(0);
+			rerollAudio.get(0).start();
+		}
 	}
 
 	public void playAudio_Misthrow(int numMisthrow) {
-		System.out.println("misthrow audio with num " + numMisthrow);
-		if (numMisthrow < 4) {
-			misthrowAudio.get(numMisthrow - 1).setMicrosecondPosition(0);
-			misthrowAudio.get(numMisthrow - 1).start();
+		if (SOUND) {
+			System.out.println("misthrow audio with num " + numMisthrow);
+			if (numMisthrow < 4) {
+				misthrowAudio.get(numMisthrow - 1).setMicrosecondPosition(0);
+				misthrowAudio.get(numMisthrow - 1).start();
+			}
 		}
 	}
 
 	public void playAudio_Random() {
-		if (alreadyPlayedRnd.length > playedRandomClips) {
-			if (rnd.nextDouble() < 0.3) {
-				int clipnum = rnd.nextInt(alreadyPlayedRnd.length-playedRandomClips);
-				for (int i = 0; i < alreadyPlayedRnd.length; i++) {
-					if (!alreadyPlayedRnd[i]) {
-						if (clipnum == 0) {
-							randomAudio.get(i).setMicrosecondPosition(0);
-							randomAudio.get(i).start();
-							alreadyPlayedRnd[i] = true;
-							playedRandomClips++;
+		if (SOUND) {
+			if (alreadyPlayedRnd.length > playedRandomClips) {
+				if (rnd.nextDouble() < 0.3) {
+					int clipnum = rnd.nextInt(alreadyPlayedRnd.length - playedRandomClips);
+					for (int i = 0; i < alreadyPlayedRnd.length; i++) {
+						if (!alreadyPlayedRnd[i]) {
+							if (clipnum == 0) {
+								randomAudio.get(i).setMicrosecondPosition(0);
+								randomAudio.get(i).start();
+								alreadyPlayedRnd[i] = true;
+								playedRandomClips++;
+							}
+							clipnum--;
 						}
-						clipnum--;
 					}
 				}
 			}

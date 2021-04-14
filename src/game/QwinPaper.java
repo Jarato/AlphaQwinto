@@ -124,6 +124,17 @@ public class QwinPaper {
 		return blocked;
 	}
 	
+	public int countDeadFields() {
+		boolean[][] blocked = generateBlockedFields();
+		int count = 0;
+		for (int i = 0; i < LINE_LENGTH; i++) {
+			if (lineRed[i] == 0 && blocked[0][i]) count++;
+			if (lineYellow[i] == 0 && blocked[1][i]) count++;
+			if (linePurple[i] == 0 && blocked[2][i]) count++;
+		}
+		return count;
+	}
+	
 	public int calculateScore() {
 		if (!reCalculateScore) return lastScore;
 		int score = 0;

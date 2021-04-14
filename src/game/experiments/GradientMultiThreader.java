@@ -55,7 +55,6 @@ public class GradientMultiThreader implements Runnable {
 				gradient[i] /= data_size;
 			}
 		}
-
 	}
 
 }

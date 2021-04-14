@@ -46,7 +46,7 @@ public class TDLANN10_Collector implements MatchStatCollecting{
 					input[18 * (18 + i) + purpleline[i] - 1] = 1;
 				}
 			}
-			input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
+			input[486] = paper.getNumberOfMisthrows() / 4.;
 			input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
 			td_onegame.get(j).add(new Pair<double[], Double>(input, -1.));
 		}

@@ -16,15 +16,19 @@ import pdf.util.UtilMethods;
 
 public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 	private FeedForwardNetwork scoreEvalNetwork;
+	private String weights_file = "";
 	private ArrayList<Pair<double[], Double>> paperScoreHistory = new ArrayList<Pair<double[], Double>>();
-	
+	private int version;
+
 	public QwinPlayerLA_NNEval(Random rnd, int version) {
 		super(rnd);
+		this.version = version;
 		initNet(version);
 	}
 
 	public QwinPlayerLA_NNEval(Random rnd, int version, String weights_file_path) {
 		this(rnd, version);
+		weights_file = weights_file_path;
 		double[] weights = read_weights_data(weights_file_path);
 		scoreEvalNetwork.applyWeightsBiasesVector(weights);
 	}
@@ -94,56 +98,26 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 		return paperScoreHistory;
 	}
 
-	// 8
-	private void initNet8() {
-		scoreEvalNetwork = new FeedForwardNetwork();
-		scoreEvalNetwork.addBlock(515, 100, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(100, 50, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(50, 20, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(20, 1, true, Activation.NONE);
-		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
-	}
-
-	// 9 init
-	private void initNet9() {
-		scoreEvalNetwork = new FeedForwardNetwork();
-		scoreEvalNetwork.addBlock(83, 80, true, Activation.TANH);
-		scoreEvalNetwork.addBlock(80, 1, true, Activation.NONE);
-		scoreEvalNetwork.setAllWeightsRandom(rnd, 0.01);
-	}
-
-	// 11 init
-		private void initNet11() {
-			scoreEvalNetwork = new FeedForwardNetwork();
-			scoreEvalNetwork.addBlock(488, 50, true, Activation.TANH);
-			scoreEvalNetwork.addBlock(50, 1, true, Activation.NONE);
-			scoreEvalNetwork.setAllWeightsRandom(rnd, 0.01);
-		}
-	
-	// 11 init
+	// init
 	private void initNet(int version) {
-		if (version == 10) initNet10();
-		if (version == 11) initNet11();
+		if (version == 10)
+			initNet10();
+		if (version == 11)
+			initNet11();
+		if (version == 12)
+			initNet12();
+		if (version == 13)
+			initNet13();
 	}
 
-	// 11 fill
+	// fill
 	private void fillInputVector(QwinPaper paper, double[] input) {
-		int[] redline = paper.getRedLine();
-		int[] yellowline = paper.getYellowLine();
-		int[] purpleline = paper.getPurpleLine();
-		for (int i = 0; i < 9; i++) {
-			if (redline[i] != 0) {
-				input[i * 18 + redline[i] - 1] = 1;
-			}
-			if (yellowline[i] != 0) {
-				input[18 * (9 + i) + yellowline[i] - 1] = 1;
-			}
-			if (purpleline[i] != 0) {
-				input[18 * (18 + i) + purpleline[i] - 1] = 1;
-			}
-		}
-		input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
-		input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
+		if (version == 10)
+			fillInputVector10(paper, input);
+		if (version == 11)
+			fillInputVector11(paper, input);
+		if (version == 12 || version == 13)
+			fillInputVector12(paper, input);
 	}
 
 	// 10 init
@@ -151,7 +125,7 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 		scoreEvalNetwork = new FeedForwardNetwork();
 		scoreEvalNetwork.addBlock(488, 30, true, Activation.TANH);
 		scoreEvalNetwork.addBlock(30, 1, true, Activation.NONE);
-		scoreEvalNetwork.setAllWeightsRandom(rnd, 0.01);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
 	}
 
 	// 10 fill
@@ -170,52 +144,61 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 				input[18 * (18 + i) + purpleline[i] - 1] = 1;
 			}
 		}
-		input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
+		input[486] = paper.getNumberOfMisthrows() / 4.;
 		input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
 	}
 
-	// 9 fill
-	private void fillInputVector9(QwinPaper paper, double[] input) {
-		int[] redline = paper.getRedLine();
-		int[] yellowline = paper.getYellowLine();
-		int[] purpleline = paper.getPurpleLine();
-		boolean[][] blocked = paper.generateBlockedFields();
-		for (int i = 0; i < 9; i++) {
-			input[i] = redline[i] / 18.;
-			input[i + 9] = yellowline[i] / 18.;
-			input[i + 18] = purpleline[i] / 18.;
-			input[i + 27] = (redline[i] > 0 ? 1. : 0.);
-			input[i + 36] = (yellowline[i] > 0 ? 1. : 0.);
-			input[i + 45] = (purpleline[i] > 0 ? 1. : 0.);
-			input[i + 54] = ((blocked[0][i] && redline[i] == 0) ? 1. : 0.);
-			input[i + 63] = ((blocked[1][i] && yellowline[i] == 0) ? 1. : 0.);
-			input[i + 72] = ((blocked[2][i] && purpleline[i] == 0) ? 1. : 0.);
-		}
-		input[81] = paper.getNumberOfMisthrows() * 1. / 4.;
-		input[82] = numOfTurns / (15. + Math.abs(numOfTurns));
+	// 11 init
+	private void initNet11() {
+		scoreEvalNetwork = new FeedForwardNetwork();
+		scoreEvalNetwork.addBlock(488, 50, true, Activation.TANH);
+		scoreEvalNetwork.addBlock(50, 1, true, Activation.NONE);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
 	}
 
-	// 8
-	private void fillInputVector8(QwinPaper paper, double[] input) {
+	// 11 fill
+	private void fillInputVector11(QwinPaper paper, double[] input) {
 		int[] redline = paper.getRedLine();
 		int[] yellowline = paper.getYellowLine();
 		int[] purpleline = paper.getPurpleLine();
 		for (int i = 0; i < 9; i++) {
 			if (redline[i] != 0) {
 				input[i * 18 + redline[i] - 1] = 1;
-				input[488 + i] = 1;
 			}
 			if (yellowline[i] != 0) {
 				input[18 * (9 + i) + yellowline[i] - 1] = 1;
-				input[497 + i] = 1;
 			}
 			if (purpleline[i] != 0) {
 				input[18 * (18 + i) + purpleline[i] - 1] = 1;
-				input[506 + i] = 1;
 			}
 		}
-		input[486] = paper.getNumberOfMisthrows() * 1. / 4.;
-		input[487] = numOfTurns / (15. + Math.abs(numOfTurns));
+		input[486] = paper.getNumberOfMisthrows() / 4.;
+		input[487] = Math.tanh(numOfTurns / 25.);
+	}
+
+	// 12 init
+	private void initNet12() {
+		scoreEvalNetwork = new FeedForwardNetwork();
+		scoreEvalNetwork.addBlock(488, 60, true, Activation.TANH);
+		scoreEvalNetwork.addBlock(60, 60, true, Activation.ELU);
+		scoreEvalNetwork.addBlock(60, 1, true, Activation.NONE);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
+	}
+
+	// 12 fill
+	private void fillInputVector12(QwinPaper paper, double[] input) {
+		fillInputVector11(paper, input);
+		input[487] = Math.tanh(numOfTurns / 20.);
+	}
+
+	// 12 init
+	private void initNet13() {
+		scoreEvalNetwork = new FeedForwardNetwork();
+		scoreEvalNetwork.addBlock(488, 100, true, Activation.ELU);
+		scoreEvalNetwork.addBlock(100, 100, true, Activation.ELU);
+		scoreEvalNetwork.addBlock(100, 100, true, Activation.ELU);
+		scoreEvalNetwork.addBlock(100, 1, true, Activation.NONE);
+		scoreEvalNetwork.setAllWeightsRandom(rnd, 1);
 	}
 
 	// fill input vector for
@@ -249,7 +232,7 @@ public class QwinPlayerLA_NNEval extends QwinPlayerLookahead_t {
 
 	@Override
 	public String getName() {
-		return "LANNEVAL(" + UtilMethods.roundTo(noiselevel, 2) + ")";
+		return "LANNEVAL" + version + "(" + UtilMethods.roundTo(noiselevel, 2) + "," + weights_file + ")";
 	}
 
 }

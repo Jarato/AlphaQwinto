@@ -18,8 +18,12 @@ public class Test_Gen extends Match_Generator {
 	@Override
 	protected QwinPlayer_t[] generatePlayers() {
 		QwinPlayer_t[] player = new QwinPlayer_t[2];
-		player[0] = new QwinPlayerExpertETest2(new Random(rnd.nextLong()));
-		player[1] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 10, "LANNEVAL10_weights.txt");
+		//player[0] = new QwinPlayerExpertETest2(new Random(rnd.nextLong()));
+		player[0] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 10, "LANNEVAL10_weights.txt");
+		//player[1] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 11, "LANNEVAL11_weights.txt");
+		player[1] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 12, "LANNEVAL12_weightsB.txt");
+		//player[1] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 13, "LANNEVAL13_weights205.txt");
+		//player[1] = new QwinPlayerLA_NNEval(new Random(rnd.nextLong()), 13, "LANNEVAL13_weights.txt");
 		//player[2] = new QwinPlayerNN2Test(new Random(rnd.nextLong()));
 		//player[3] = new QwinPlayerNNTestOld(new Random(rnd.nextLong()));
 		return player;
